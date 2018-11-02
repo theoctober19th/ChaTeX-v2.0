@@ -1,8 +1,12 @@
 package com.thecoffeecoders.chatex;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,8 +17,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.thecoffeecoders.chatex.fragments.ChatFragment;
+import com.thecoffeecoders.chatex.fragments.FriendsFragment;
+import com.thecoffeecoders.chatex.fragments.GroupsFragment;
+import com.thecoffeecoders.chatex.fragments.RequestsFragment;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        ChatFragment.OnFragmentInteractionListener,
+        FriendsFragment.OnFragmentInteractionListener,
+        GroupsFragment.OnFragmentInteractionListener,
+        RequestsFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,22 +93,37 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        Fragment fragment = null;
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
+        if (id == R.id.nav_chats) {
+            //ChatFragment
+            fragment = new ChatFragment();
+        } else if (id == R.id.nav_friends) {
+            //FriendsFragment
+            fragment = new FriendsFragment();
+        } else if (id == R.id.nav_group) {
+            //GroupFragment
+            fragment = new GroupsFragment();
+        } else if (id == R.id.nav_requests) {
+            //RequestsFragment
+            fragment = new RequestsFragment();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
         }
 
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.navdrawer_screen_area, fragment);
+        fragmentTransaction.commit();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
