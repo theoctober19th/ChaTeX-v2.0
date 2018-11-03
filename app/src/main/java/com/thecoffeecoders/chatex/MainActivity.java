@@ -1,5 +1,6 @@
 package com.thecoffeecoders.chatex;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +18,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.login.LoginManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.thecoffeecoders.chatex.auth.LoginActivity;
 import com.thecoffeecoders.chatex.fragments.ChatFragment;
 import com.thecoffeecoders.chatex.fragments.FriendsFragment;
 import com.thecoffeecoders.chatex.fragments.GroupsFragment;
@@ -29,10 +34,17 @@ public class MainActivity extends AppCompatActivity
         GroupsFragment.OnFragmentInteractionListener,
         RequestsFragment.OnFragmentInteractionListener {
 
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //check whether the user is signed in or not
+        checkUserSignedIn();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -53,6 +65,24 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void checkUserSignedIn() {
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        if(mUser != null){
+            return;
+        } else{
+            promptForLogin();
+        }
+    }
+
+    private void promptForLogin() {
+        //TODO take the user to Login Page
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        finish();
+        startActivity(loginIntent);
     }
 
     @Override
@@ -80,11 +110,19 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
+            signOutUser();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void signOutUser() {
+        FirebaseAuth.getInstance().signOut();
+        LoginManager.getInstance().logOut();
+
+        promptForLogin();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
