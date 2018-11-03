@@ -41,6 +41,9 @@ dependencies {
 
     //Facebook SDK
     implementation 'com.facebook.android:facebook-login:[4,5)'
+
+    //Google SignIn
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 }
 
 //needed for Firebase to work
