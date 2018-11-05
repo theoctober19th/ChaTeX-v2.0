@@ -33,8 +33,14 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.thecoffeecoders.chatex.MainActivity;
 import com.thecoffeecoders.chatex.R;
+import com.thecoffeecoders.chatex.users.EditProfileActivity;
 
 import java.util.Arrays;
 
@@ -51,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = "FACEBOOK";
     private static final int RC_SIGN_IN_GOOGLE = 123;
+    private String provider = "firebase";
 
     //Layout Elements
     private ImageButton mFacebookLoginBtn;
@@ -131,14 +138,41 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void updateUI(FirebaseUser currentUser) {
+
         if(currentUser != null){
 
-            //Take user to MainActivity
-            stopLoadingAnimation();
-            Intent mainIntent = new Intent(this, MainActivity.class);
-            mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            finish();
-            startActivity(mainIntent);
+            //Check if user already exists (means it is not the first time the user is logging in)
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users/"+currentUser.getUid());
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){ //user already exists
+
+                        //Take user to MainActivity
+                        stopLoadingAnimation();
+                        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        mainIntent.putExtra("provider", provider);
+                        finish();
+                        startActivity(mainIntent);
+                    }else{
+
+                        //Take user to EditProfileActivity
+                        stopLoadingAnimation();
+                        Intent editProfileIntent = new Intent(LoginActivity.this, EditProfileActivity.class);
+                        editProfileIntent.putExtra("isNew", true);
+                        editProfileIntent.putExtra("provider", provider);
+                        startActivity(editProfileIntent);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+
         }
     }
 
@@ -179,6 +213,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            provider = "google";
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -205,6 +240,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            provider = "facebook";
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
