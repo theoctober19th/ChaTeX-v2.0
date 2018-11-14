@@ -51,7 +51,9 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".users.EditProfileActivity"></activity>
+        <activity android:name=".users.EditProfileActivity" />
+        <activity android:name=".users.UserProfileActivity" />
+        <activity android:name=".ChatActivity"></activity>
     </application>
 
 </manifest>

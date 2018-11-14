@@ -37,7 +37,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.0.5'
 
     //Firebase Realtime Database
-    implementation 'com.google.firebase:firebase-database:16.0.4'
+    implementation 'com.google.firebase:firebase-database:16.0.3'
+
+    //Firebase Storage
+    implementation 'com.google.firebase:firebase-storage:16.0.3'
 
     //Facebook SDK
     implementation 'com.facebook.android:facebook-login:[4,5)'
@@ -51,6 +54,11 @@ dependencies {
     //Glide Library
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
+
+    // FirebaseUI for Firebase Realtime Database
+    implementation 'com.firebaseui:firebase-ui-database:4.2.1'
+
+
 }
 
 //needed for Firebase to work

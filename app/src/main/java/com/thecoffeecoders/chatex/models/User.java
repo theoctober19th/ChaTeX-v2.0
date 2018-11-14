@@ -7,25 +7,55 @@ import java.util.Map;
 
 public class User {
     private String id;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     private String username;
     private String displayName;
     private String email;
     private String bio;
     private String address;
     private String phoneNumber;
-    private Uri profilePicURI;
-    private Uri coverPictureURI;
+    private String gender;
+    private String profilePicURI;
+    private String coverPictureURI;
+    private long lastOnline;
+    private boolean onlineStatus;
+
+    public long getLastOnline() {
+        return lastOnline;
+    }
+
+    public void setLastOnline(long lastOnline) {
+        this.lastOnline = lastOnline;
+    }
+
+    public boolean isOnlineStatus() {
+        return onlineStatus;
+    }
+
+    public void setOnlineStatus(boolean onlineStatus) {
+        this.onlineStatus = onlineStatus;
+    }
 
     public User() {
+        id = "";
+        username = "";
+        displayName = "";
+        email = "";
+        bio = "";
+        address = "";
+        phoneNumber = "";
+        gender = "";
+        profilePicURI = "";
+        coverPictureURI = "";
+        lastOnline = 0;
+        onlineStatus = false;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getUsername() {
@@ -76,25 +106,34 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public Uri getProfilePicURI() {
+    public String getProfilePicURI() {
         return profilePicURI;
     }
 
-    public void setProfilePicURI(Uri profilePicURI) {
+    public void setProfilePicURI(String profilePicURI) {
         this.profilePicURI = profilePicURI;
     }
 
-    public Uri getCoverPictureURI() {
+    public String getCoverPictureURI() {
         return coverPictureURI;
     }
 
-    public void setCoverPictureURI(Uri coverPictureURI) {
+    public void setCoverPictureURI(String coverPictureURI) {
         this.coverPictureURI = coverPictureURI;
     }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
 
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
 
+        result.put("id", id);
         result.put("username", username);
         result.put("displayname", displayName);
         result.put("email", email);
@@ -103,6 +142,9 @@ public class User {
         result.put("phone", phoneNumber);
         result.put("profilepic", profilePicURI);
         result.put("coverpic", coverPictureURI);
+        result.put("online", onlineStatus);
+        result.put("gender", gender);
+        result.put("lastonline", lastOnline);
 
         return result;
     }

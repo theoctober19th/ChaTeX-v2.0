@@ -1,6 +1,8 @@
 package com.thecoffeecoders.chatex.auth;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -100,6 +102,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onError(FacebookException error) {
                         Log.d(TAG, "facebook:onError", error);
+                        createAlertDialog("Authentication failed", "No internet connection");
                         // ...
                     }
                 });
@@ -149,7 +152,7 @@ public class LoginActivity extends AppCompatActivity {
                     if(dataSnapshot.exists()){ //user already exists
 
                         //Take user to MainActivity
-                        stopLoadingAnimation();
+                        if(mFacebookLoginDialog != null) stopLoadingAnimation();
                         Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                         mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         mainIntent.putExtra("provider", provider);
@@ -158,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
                     }else{
 
                         //Take user to EditProfileActivity
-                        stopLoadingAnimation();
+                        if(mFacebookLoginDialog != null) stopLoadingAnimation();
                         Intent editProfileIntent = new Intent(LoginActivity.this, EditProfileActivity.class);
                         editProfileIntent.putExtra("isNew", true);
                         editProfileIntent.putExtra("provider", provider);
@@ -218,7 +221,9 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            stopLoadingAnimation();
                             Snackbar.make(findViewById(R.id.loginParentConstraintLayout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                            createAlertDialog("Authentication failed", "Check your internet connection and app permissions.");
                             updateUI(null);
                         }
 
@@ -253,6 +258,19 @@ public class LoginActivity extends AppCompatActivity {
                         // ...
                     }
                 });
+    }
+
+    private void createAlertDialog(String title, String alertMessage){
+        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(alertMessage);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
     public void startLoadingAnimation(){
