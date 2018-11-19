@@ -21,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity
     private TextView displayNameTextView;
     private ImageView profilePictureImageView;
     private ImageView coverPictureImageView;
+    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,15 +100,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -121,8 +114,8 @@ public class MainActivity extends AppCompatActivity
         displayNameTextView = navigationView.getHeaderView(0).findViewById(R.id.main_displayNameTextview);
         coverPictureImageView = navigationView.getHeaderView(0).findViewById(R.id.main_coverPictureImageView);
         profilePictureImageView = navigationView.getHeaderView(0).findViewById(R.id.main_profilePictureImgView);
-
-
+        mProgressBar = navigationView.getHeaderView(0).findViewById(R.id.nav_bar_progress_bar);
+        mProgressBar.setVisibility(ProgressBar.VISIBLE);
         if(mUser != null){
             new DownloadUserDataAndUpdateUITask().execute();
             //updateHeaderWithInfo();
@@ -235,47 +228,6 @@ public class MainActivity extends AppCompatActivity
         mAuth.addAuthStateListener(mAuthStateListener);
     }
 
-//    public void updateHeaderWithInfo(){
-//        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mUser.getUid());
-//        userRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                localUser = dataSnapshot.getValue(User.class);
-//
-//                if(localUser.getProfilePicURI() != null){
-//                    RequestOptions requestOptions = new RequestOptions()
-//                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                            .placeholder(R.drawable.img_profile_picture_placeholder_female);
-//                    Glide.with(MainActivity.this)
-//                            .applyDefaultRequestOptions(requestOptions)
-//                            .load(localUser.getProfilePicURI())
-//                            .into(profilePictureImageView);
-//                }
-//
-//                if(localUser.getCoverPictureURI() != null){
-//                    RequestOptions requestOptions = new RequestOptions()
-//                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                            .placeholder(R.drawable.img_cover_photo_placeholder);
-//                    Glide.with(MainActivity.this)
-//                            .applyDefaultRequestOptions(requestOptions)
-//                            .load(localUser.getCoverPictureURI())
-//                            .into(coverPictureImageView);
-//                }
-//                if(localUser.getDisplayName() != null){
-//                    displayNameTextView.setText(localUser.getDisplayName());
-//                }
-//                if(localUser.getUsername() != null){
-//                    usernameTextView.setText(localUser.getUsername());
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                Log.d("firebasedatabase", databaseError.getMessage());
-//            }
-//        });
-//    }
-
     private class DownloadUserDataAndUpdateUITask extends AsyncTask<Void, Void, Void>{
 
         MainActivity mainActivity;
@@ -283,6 +235,13 @@ public class MainActivity extends AppCompatActivity
         public void setContext(MainActivity mainActivity){
             this.mainActivity = mainActivity;
         }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressBar.setVisibility(ProgressBar.VISIBLE);
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
                 DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mUser.getUid());
@@ -334,6 +293,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Void avoid) {
             super.onPostExecute(avoid);
+            mProgressBar.setVisibility(ProgressBar.GONE);
         }
     }
 }

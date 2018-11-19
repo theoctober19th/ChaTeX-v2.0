@@ -21,7 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.thecoffeecoders.chatex.ChatActivity;
+import com.thecoffeecoders.chatex.chat.ChatActivity;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.models.User;
 
