@@ -9,6 +9,9 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -39,6 +43,8 @@ import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.auth.LoginActivity;
 import com.thecoffeecoders.chatex.models.User;
 
+import org.w3c.dom.Text;
+
 import java.util.Arrays;
 import java.util.Map;
 
@@ -58,7 +64,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
     EditText usernameEditText;
     EditText bioEditText;
     Spinner genderSpinner;
-    EditText emailEditText;
+    //EditText emailEditText;
     EditText addressEditText;
     Button updateInfoBtn;
 
@@ -86,7 +92,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         usernameEditText = findViewById(R.id.et_username);
         bioEditText = findViewById(R.id.et_bio);
 
-        emailEditText = findViewById(R.id.et_email);
+        //emailEditText = findViewById(R.id.et_email);
         addressEditText = findViewById(R.id.et_address);
         updateInfoBtn = findViewById(R.id.btnUpdateInfo);
 
@@ -104,7 +110,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         if(bundleExtras != null){
             if(bundleExtras.getBoolean("isNew")){
                 new PopulateFormWithUserDataFromProvider().execute();
-                emailEditText.setEnabled(false);
+                //emailEditText.setEnabled(false);
             } else{
 
             }
@@ -231,10 +237,6 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
                 genderSpinner.setSelection(Arrays.asList(getResources().getStringArray(R.array.gender_array)).indexOf(user.getGender()));
             }
 
-            if(user.getEmail() != null){
-                emailEditText.setText(user.getEmail());
-            }
-
             if(user.getAddress() != null){
                 addressEditText.setText(user.getAddress());
             }
@@ -245,10 +247,91 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
                     updateUserInformation();
                 }
             });
+
+            usernameEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    final String username = s.toString();
+                    DatabaseReference usernameRef = FirebaseDatabase.getInstance().getReference("usernames/"+username);
+                    usernameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists() && username!=user.getUsername() && !TextUtils.isEmpty(username)){
+                                usernameEditText.setError("Username already taken");
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            });
         }
     }
 
     private void updateUserInformation() {
+        String displayName = nameEditText.getText().toString();
+        if(TextUtils.isEmpty(displayName)){
+            nameEditText.setError("Name cannot be empty");
+            nameEditText.requestFocus();
+            return;
+        }
+
+        String bio = bioEditText.getText().toString();
+        if(TextUtils.isEmpty(bio)){
+            bioEditText.setError("Bio cannot be empty");
+            bioEditText.requestFocus();
+            return;
+        }
+
+        String address = addressEditText.getText().toString();
+        if(TextUtils.isEmpty(address)){
+            addressEditText.setError("Address cannot be empty");
+            addressEditText.requestFocus();
+            return;
+        }
+
+        final String username = usernameEditText.getText().toString();
+        if(TextUtils.isEmpty(username)){
+            usernameEditText.setError("Username cannot be empty");
+            usernameEditText.requestFocus();
+            return;
+        }
+
+        DatabaseReference usernameRef = FirebaseDatabase.getInstance().getReference("usernames/"+username);
+        usernameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists() && username!=user.getUsername()) {
+                        usernameEditText.setError("Username already exists");
+                        usernameEditText.requestFocus();
+                        return;
+                    }else{
+                        updateDatabaseWithNewUserInfo();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+    }
+
+    private void updateDatabaseWithNewUserInfo() {
+
         startProgressDialog("Updating information", "Please wait");
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(mUser.getUid());
 
@@ -266,13 +349,35 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         userRef.setValue(updatedUser).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                hideProgressDialog();
+                final DatabaseReference usernameRef = FirebaseDatabase.getInstance().getReference("usernames").child(usernameEditText.getText().toString());
+                usernameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(!dataSnapshot.exists()){
+                            usernameRef.setValue(mUser.getUid()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){
+                                        hideProgressDialog();
 
-                //Take to MainActivity
-                Intent mainIntent = new Intent(EditProfileActivity.this, MainActivity.class);
-                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                finish();
-                startActivity(mainIntent);
+                                        //Take to MainActivity
+                                        Intent mainIntent = new Intent(EditProfileActivity.this, MainActivity.class);
+                                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        finish();
+                                        startActivity(mainIntent);
+                                    }else{
+                                        createAlertDialog("Error Writing to Database", "Please check your internet connection");
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
