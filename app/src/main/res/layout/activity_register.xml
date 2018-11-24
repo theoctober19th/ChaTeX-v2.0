@@ -6,12 +6,12 @@
     android:background="@drawable/img_math_background">
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/buttonGoogleLogin"
+        android:id="@+id/register_buttonGoogleLogin"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="148dp"
+        android:layout_marginStart="149dp"
         android:layout_marginBottom="20dp"
         android:clickable="true"
         app:backgroundTint="@color/colorAccent"
@@ -21,18 +21,19 @@
         android:id="@+id/cv"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_above="@+id/buttonGoogleLogin"
+        android:layout_above="@+id/register_buttonGoogleLogin"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="25dp"
+        android:background="@drawable/img_chatex_logo_big"
         app:cardCornerRadius="6dp"
         app:cardElevation="3dp"
         app:cardUseCompatPadding="true">
 
         <LinearLayout
-            android:id="@+id/login_linear_layout"
+            android:id="@+id/register_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignStart="@+id/cv"
+            android:background="@android:color/transparent"
             android:orientation="vertical"
             android:transitionName="layoutTransition">
 
@@ -52,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="50dp"
-                    android:text="Login"
+                    android:text="Register"
                     android:textColor="#FFCC00"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -72,10 +73,10 @@
                     android:textColorHint="#c5c5c5">
 
                     <EditText
-                        android:id="@+id/login_username_email_et"
+                        android:id="@+id/register_email_et"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Email / Username"
+                        android:hint="Email"
                         android:inputType="textEmailAddress"
                         android:paddingBottom="10dp"
                         android:textColor="#2fa881"
@@ -96,7 +97,7 @@
                     android:textColorHint="#c5c5c5">
 
                     <EditText
-                        android:id="@+id/login_password_et"
+                        android:id="@+id/register_password_et"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Password"
@@ -107,65 +108,78 @@
                 </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="#c5c5c5">
+
+                    <EditText
+                        android:id="@+id/register_retype_password_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Retype Password"
+                        android:inputType="textPassword"
+                        android:paddingBottom="10dp"
+                        android:textColor="#2fa881"
+                        android:textSize="13sp" />
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="25dp"
                 android:gravity="center">
 
                 <Button
-                    android:id="@+id/login_btn"
+                    android:id="@+id/register_button"
                     android:layout_width="150dp"
                     android:layout_height="50dp"
                     android:background="@drawable/rounded_button"
-                    android:text="Login" />
+                    android:onClick="clickLogin"
+                    android:text="Register"
+                    android:textColor="#d3d3d3" />
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/login_forgot_password_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:onClick="clickResetPassword"
-                android:text="Forgot your password?"
-                android:textColor="#9a9a9a"
-                android:textSize="12sp" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_register"
+        android:id="@+id/fab_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/cv"
         android:layout_alignEnd="@id/cv"
         android:layout_marginTop="25dp"
         android:layout_marginEnd="-20dp"
-        android:onClick="inflateRegisterLayout"
-        android:src="@android:drawable/ic_menu_add"
+        android:onClick="inflateLoginLayout"
         android:transitionName="loginFab"
         app:fabSize="normal" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/buttonFacebookLogin"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_alignTop="@+id/buttonGoogleLogin"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="128dp"
-        android:clickable="true"
-        app:srcCompat="@drawable/com_facebook_button_icon_blue" />
+    android:id="@+id/register_buttonFacebookLogin"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:layout_alignTop="@+id/register_buttonGoogleLogin"
+    android:layout_alignParentEnd="true"
+    android:layout_marginTop="0dp"
+    android:layout_marginEnd="128dp"
+    android:clickable="true"
+    app:srcCompat="@drawable/com_facebook_button_icon_blue" />
 
     <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:id="@+id/imageView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
         app:srcCompat="@drawable/img_chatex_logo_big" />
 
 </RelativeLayout>
-

@@ -140,8 +140,11 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
             if(bundleExtras != null){
                 if(bundleExtras.getBoolean("isNew")){
                     if(bundleExtras.getString("provider").equals("firebase")){
-                        user.setDisplayName(mUser.getDisplayName());
-                        user.setProfilePicURI(mUser.getPhotoUrl().toString());
+                        if(mUser.getDisplayName() != null){
+                            user.setDisplayName(mUser.getDisplayName());
+                        }else if(mUser.getPhotoUrl() != null){
+                            user.setProfilePicURI(mUser.getPhotoUrl().toString());
+                        }
                         user.setEmail(mUser.getEmail());
                     }else if(bundleExtras.getString("provider").equals("google")|| bundleExtras.getString("provider").equals("facebook")){
                         for (UserInfo profile : mUser.getProviderData()) {

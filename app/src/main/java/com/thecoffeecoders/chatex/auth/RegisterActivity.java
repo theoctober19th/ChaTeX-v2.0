@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -52,7 +51,7 @@ import com.thecoffeecoders.chatex.users.EditProfileActivity;
 
 import java.util.Arrays;
 
-public class LoginActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     //Facebook SDK objects
     private CallbackManager mCallbackManager;
@@ -70,11 +69,11 @@ public class LoginActivity extends AppCompatActivity {
     //Layout Elements
     private FloatingActionButton mFacebookLoginBtn;
     private FloatingActionButton mGoogleLoginBtn;
-    private LinearLayout mLoginLinearLayout;
-    private EditText mUsernameEmailEditText;
+    private LinearLayout mRegisterLinearLayout;
+    private EditText mEmailEditText;
     private EditText mPasswordEditText;
-    private Button mLoginButton;
-    private TextView mForgotPasswordTextView;
+    private EditText mRetypePasswordEditText;
+    private Button mRegisterButton;
 
     //Logging in Progress Dialog
     private ProgressDialog mFacebookLoginDialog;
@@ -82,41 +81,28 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_register);
 
+        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        //instantiate views
-        mLoginLinearLayout = findViewById(R.id.login_linear_layout);
-        mUsernameEmailEditText = findViewById(R.id.login_username_email_et);
-        mPasswordEditText = findViewById(R.id.login_password_et);
-        mLoginButton = findViewById(R.id.login_btn);
-        mForgotPasswordTextView  = findViewById(R.id.login_forgot_password_textview);
+        instantiateViews();
 
-        //Forgot Password
-        mForgotPasswordTextView.setOnClickListener(new View.OnClickListener() {
+        //Initialize general register button
+        mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent forgotPasswordIntent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-                startActivity(forgotPasswordIntent);
-            }
-        });
-
-        //Initialize general login button
-        mLoginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signInWithEmailAndPassword();
+                registerUserWithEmail();
             }
         });
 
         // Initialize Facebook Login button
         mCallbackManager = CallbackManager.Factory.create();
-        mFacebookLoginBtn  = findViewById(R.id.buttonFacebookLogin);
+        mFacebookLoginBtn  = findViewById(R.id.register_buttonFacebookLogin);
         mFacebookLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("email", "public_profile"));
+                LoginManager.getInstance().logInWithReadPermissions(RegisterActivity.this, Arrays.asList("email", "public_profile"));
                 LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
@@ -143,9 +129,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
         // Configure Google Sign In
-        mGoogleLoginBtn = findViewById(R.id.buttonGoogleLogin);
+        mGoogleLoginBtn = findViewById(R.id.register_buttonGoogleLogin);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -160,100 +145,36 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    public void signInWithEmailAndPassword(){
-        String mode = "";
-        final String usernameEmail = mUsernameEmailEditText.getText().toString();
-        final String password = mPasswordEditText.getText().toString();
-
-        if(TextUtils.isEmpty(usernameEmail)){
-            mUsernameEmailEditText.setError("This field cannot be blank");
-            mUsernameEmailEditText.requestFocus();
-            return;
-        }else if(TextUtils.isEmpty(password)){
-            mPasswordEditText.setError("Password cannot be blank");
-            mPasswordEditText.requestFocus();
-            return;
-        }
-
-        startLoadingAnimation();
-        if(android.util.Patterns.EMAIL_ADDRESS.matcher(usernameEmail).matches()){
-            firebaseSignInWithEmailAndPassword(usernameEmail, password);
-        }else{
-            DatabaseReference usernameRef = FirebaseDatabase.getInstance().getReference("usernames/"+usernameEmail);
-            usernameRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists()){
-                        //The Username Exists
-                        final String userID = dataSnapshot.getValue().toString();
-                        DatabaseReference emailRef = FirebaseDatabase.getInstance().getReference("users/"+userID+"/email");
-                        emailRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if(dataSnapshot.exists()){
-                                    final String email = dataSnapshot.getValue().toString();
-                                    firebaseSignInWithEmailAndPassword(email, password);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }else{
-                        createAlertDialog("Authentication failed", "The entered username does not exist.");
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }
-
-    }
-
-
-    public void firebaseSignInWithEmailAndPassword(String email, String password){
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            stopLoadingAnimation();
-                            try {
-                                throw task.getException();
-                            } catch(FirebaseAuthInvalidCredentialsException e) {
-                                createAlertDialog("Login Failed", "The credentials you provided do not match.");
-                            } catch(Exception e) {
-                                createAlertDialog("Login Failed", "Please check the credentials and your internet connection");
-                            }
-                        }
-
-                        //..
-                    }
-                });
-    }
-
     public void signInWithGoogle(){
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void handleFacebookAccessToken(AccessToken accessToken) {
+        Log.d(TAG, "handleFacebookAccessToken:" + accessToken);
 
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+        AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            provider = "facebook";
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
+
+                        // ...
+                    }
+                });
     }
 
     private void updateUI(FirebaseUser currentUser) {
@@ -269,7 +190,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         //Take user to MainActivity
                         if(mFacebookLoginDialog != null) stopLoadingAnimation();
-                        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                        Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
                         mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         mainIntent.putExtra("provider", provider);
                         finish();
@@ -278,7 +199,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         //Take user to EditProfileActivity
                         if(mFacebookLoginDialog != null) stopLoadingAnimation();
-                        Intent editProfileIntent = new Intent(LoginActivity.this, EditProfileActivity.class);
+                        Intent editProfileIntent = new Intent(RegisterActivity.this, EditProfileActivity.class);
                         editProfileIntent.putExtra("isNew", true);
                         editProfileIntent.putExtra("provider", provider);
                         startActivity(editProfileIntent);
@@ -293,6 +214,117 @@ public class LoginActivity extends AppCompatActivity {
 
 
         }
+    }
+
+    private void registerUserWithEmail() {
+        final String email = mEmailEditText.getText().toString();
+        final String password = mPasswordEditText.getText().toString();
+        final String retypedPassword = mRetypePasswordEditText.getText().toString();
+
+        if(TextUtils.isEmpty(email)){
+            mEmailEditText.setError("This field cannot be blank");
+            mEmailEditText.requestFocus();
+            return;
+        }else if(TextUtils.isEmpty(password)){
+            mPasswordEditText.setError("Password cannot be blank");
+            mPasswordEditText.requestFocus();
+            return;
+        }else if(!password.equals(retypedPassword)){
+            mRetypePasswordEditText.setError("Retyped password does not match");
+            mRetypePasswordEditText.requestFocus();
+            return;
+        }
+
+
+        if(android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            firebaseCreateUserWithEmailAndPassword(email, password);
+        }else{
+            mEmailEditText.setError("Invalid email address");
+            mEmailEditText.requestFocus();
+        }
+    }
+
+    private void instantiateViews() {
+        mRegisterLinearLayout = findViewById(R.id.register_linear_layout);
+        mEmailEditText = findViewById(R.id.register_email_et);
+        mPasswordEditText = findViewById(R.id.register_password_et);
+        mRegisterButton = findViewById(R.id.register_button);
+        mRetypePasswordEditText = findViewById(R.id.register_retype_password_et);
+    }
+
+    public void inflateLoginLayout(View view) {
+        Intent registerIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+
+        Pair[] pairs = new Pair[1];
+        pairs[0] = new Pair<View, String>(mRegisterLinearLayout, "layoutTransition");
+
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(RegisterActivity.this, pairs);
+        startActivity(registerIntent, options.toBundle());
+        finish();
+    }
+
+    public void startLoadingAnimation(){
+        mFacebookLoginDialog = new ProgressDialog(RegisterActivity.this);
+        mFacebookLoginDialog.setTitle("Logging in");
+        mFacebookLoginDialog.setMessage("Please Wait..");
+        mFacebookLoginDialog.setCanceledOnTouchOutside(false);
+        mFacebookLoginDialog.show();
+    }
+
+    public void stopLoadingAnimation(){
+        mFacebookLoginDialog.dismiss();
+    }
+
+    private void createAlertDialog(String title, String alertMessage){
+        AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(alertMessage);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
+
+    public void firebaseCreateUserWithEmailAndPassword(String email, String password){
+
+        startLoadingAnimation();
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        } else {
+                            stopLoadingAnimation();
+                            try {
+                                throw task.getException();
+                            } catch(FirebaseAuthWeakPasswordException e) {
+                                createAlertDialog("Registration Error", "The entered password is too weak. Please choose a strong password.");
+                            } catch(FirebaseAuthInvalidCredentialsException e) {
+                                createAlertDialog("Registration Error", "The credentials provided are invalid. Please provide valid credentials");
+                            } catch(FirebaseAuthUserCollisionException e) {
+                                createAlertDialog("Registration Error", "An user with the entered email already exists. Please login with your password.");
+                            } catch(Exception e) {
+                                createAlertDialog("Registration Error", "Please check the credentials and your internet connection");
+                            }
+                        }
+                    }
+                });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
     }
 
     @Override
@@ -346,70 +378,6 @@ public class LoginActivity extends AppCompatActivity {
                         // ...
                     }
                 });
-    }
-
-
-    private void handleFacebookAccessToken(AccessToken accessToken) {
-        Log.d(TAG, "handleFacebookAccessToken:" + accessToken);
-
-        AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            provider = "facebook";
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-
-                        // ...
-                    }
-                });
-    }
-
-    private void createAlertDialog(String title, String alertMessage){
-        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(alertMessage);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        alertDialog.show();
-    }
-
-    public void startLoadingAnimation(){
-        mFacebookLoginDialog = new ProgressDialog(LoginActivity.this);
-        mFacebookLoginDialog.setTitle("Logging in");
-        mFacebookLoginDialog.setMessage("Please Wait..");
-        mFacebookLoginDialog.setCanceledOnTouchOutside(false);
-        mFacebookLoginDialog.show();
-    }
-
-    public void stopLoadingAnimation(){
-        mFacebookLoginDialog.dismiss();
-    }
-
-    public void inflateRegisterLayout(View view) {
-        Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-
-        Pair[] pairs = new Pair[1];
-        pairs[0] = new Pair<View, String>(mLoginLinearLayout, "layoutTransition");
-
-        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, pairs);
-        startActivity(registerIntent, options.toBundle());
-        finish();
     }
 
 }

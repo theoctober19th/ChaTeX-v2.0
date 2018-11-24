@@ -28,7 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".auth.LoginActivity" />
+        <activity
+            android:name=".auth.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <!-- Facebook Login Activity -->
         <meta-data
@@ -56,6 +58,11 @@
         <activity android:name=".chat.ChatActivity" />
         <activity android:name=".AddGroupActivity" />
         <activity android:name=".chat.GroupChatActivity" />
+        <activity
+            android:name=".auth.RegisterActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".auth.ForgotPasswordActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
