@@ -19,14 +19,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,7 +40,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import com.thecoffeecoders.chatex.MainActivity;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.auth.LoginActivity;
@@ -45,15 +53,23 @@ import com.thecoffeecoders.chatex.models.User;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+
+import id.zelory.compressor.Compressor;
 
 public class EditProfileActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     Bundle bundleExtras;
 
+    final int RC_IMAGE_PICKER_PROFILE_PICTURE = 001;
+    final int RC_IMAGE_PICKER_COVER_PICTURE = 002;
+
     FirebaseAuth mAuth;
     FirebaseUser mUser;
+    FirebaseStorage mStorage;
 
     //UI elements
     ImageView coverPictureImgView;
@@ -68,6 +84,8 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
     EditText addressEditText;
     Button updateInfoBtn;
 
+    ProgressBar mCoverPictureProgressBar;
+    ProgressBar mProfilePictureProgressBar;
     User user;
 
     ProgressDialog mProgressDialog;
@@ -80,6 +98,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         //Firebase Objects
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        mStorage = FirebaseStorage.getInstance();
 
         user = new User();
 
@@ -91,6 +110,8 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         nameEditText = findViewById(R.id.et_name);
         usernameEditText = findViewById(R.id.et_username);
         bioEditText = findViewById(R.id.et_bio);
+        mCoverPictureProgressBar = findViewById(R.id.edit_cover_picture_progress_bar);
+        mProfilePictureProgressBar = findViewById(R.id.edit_profile_picture_progress_bar);
 
         //emailEditText = findViewById(R.id.et_email);
         addressEditText = findViewById(R.id.et_address);
@@ -112,7 +133,8 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
                 new PopulateFormWithUserDataFromProvider().execute();
                 //emailEditText.setEnabled(false);
             } else{
-
+                //Old user (not new)
+                //a user may come here if he wants to change his profile after he has already started to use app
             }
         }
     }
@@ -390,11 +412,156 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
 
 
     public void promptCoverPictureChange(View view){
-
+        // start picker to get image for cropping and then use the image in cropping activity
+        Intent intent = CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setMinCropResultSize(500, 300)
+                .setAspectRatio(5,3)
+                .setFixAspectRatio(true)
+                .getIntent(this);
+        startActivityForResult(intent, RC_IMAGE_PICKER_COVER_PICTURE);
     }
 
     public void promptProfilePictureChange(View view){
+        // start picker to get image for cropping and then use the image in cropping activity
+        Intent intent = CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setMinCropResultSize(300, 300)
+                .setFixAspectRatio(true)
+                .getIntent(this);
+        startActivityForResult(intent, RC_IMAGE_PICKER_PROFILE_PICTURE);
+    }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RC_IMAGE_PICKER_PROFILE_PICTURE) {
+            //the profile picture has been cropped
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                mProfilePictureProgressBar.setVisibility(View.VISIBLE);
+                updateInfoBtn.setEnabled(false);
+
+                Uri profilePictureUri = result.getUri();
+                File originalPictureFile = new File(profilePictureUri.getPath());
+                File compressedPictureFile = originalPictureFile;
+                try {
+                     compressedPictureFile = new Compressor(this)
+                            .setMaxWidth(300)
+                            .setMaxHeight(300)
+                            .setQuality(75)
+                            .compressToFile(originalPictureFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                RequestOptions requestOptions = new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.img_profile_picture_placeholder_female);
+                Glide.with(EditProfileActivity.this)
+                        .applyDefaultRequestOptions(requestOptions)
+                        .load(profilePictureUri)
+                        .into(profilePictureImgView);
+
+
+                final StorageReference profilePictureStorageRef =
+                        mStorage.getReference()
+                        .child("user_profile_images")
+                        .child(mUser.getUid())
+                        .child("profile_picture.jpg");
+                UploadTask uploadTask = profilePictureStorageRef.putFile(Uri.fromFile(compressedPictureFile));
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+                        return profilePictureStorageRef.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            user.setProfilePicURI(downloadUri.toString());
+                            mProfilePictureProgressBar.setVisibility(View.GONE);
+                            updateInfoBtn.setEnabled(true);
+                        } else {
+                            // Handle failures
+                            // ...
+                        }
+                    }
+                });
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        }else if (requestCode == RC_IMAGE_PICKER_COVER_PICTURE) {
+            //the cover picture has been cropped
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                mCoverPictureProgressBar.setVisibility(View.VISIBLE);
+                updateInfoBtn.setEnabled(false);
+
+                Uri coverPictureUri = result.getUri();
+
+                File originalPictureFile = new File(coverPictureUri.getPath());
+                File compressedPictureFile = originalPictureFile;
+                try {
+                    compressedPictureFile = new Compressor(this)
+                            .setMaxWidth(500)
+                            .setMaxHeight(300)
+                            .setQuality(75)
+                            .compressToFile(originalPictureFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                RequestOptions requestOptions = new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.img_cover_photo_placeholder);
+                Glide.with(EditProfileActivity.this)
+                        .applyDefaultRequestOptions(requestOptions)
+                        .load(coverPictureUri)
+                        .into(coverPictureImgView);
+
+                final StorageReference coverPictureStorageRef =
+                        mStorage.getReference()
+                                .child("user_profile_images")
+                                .child(mUser.getUid())
+                                .child("cover_picture.jpg");
+                UploadTask uploadTask = coverPictureStorageRef.putFile(Uri.fromFile(compressedPictureFile));
+
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+                        return coverPictureStorageRef.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task){
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            user.setCoverPictureURI(downloadUri.toString());
+                            mCoverPictureProgressBar.setVisibility(View.GONE);
+                            updateInfoBtn.setEnabled(true);
+                        } else {
+                            // Handle failures
+                            // ...
+                        }
+                    }
+                });
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public void startProgressDialog(String title, String message){

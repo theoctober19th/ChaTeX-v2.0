@@ -39,6 +39,7 @@
                     android:layout_height="200dp"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="0dp"
+                    android:onClick="promptCoverPictureChange"
                     android:scaleType="centerCrop"
                     android:src="@drawable/img_cover_photo_placeholder" />
 
@@ -79,6 +80,7 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="124dp"
                     android:layout_marginTop="124dp"
+                    android:onClick="promptProfilePictureChange"
                     android:src="@drawable/img_profile_picture_placeholder_female"
                     app:civ_border_color="#EEEEEE"
                     app:civ_border_width="4dp"
@@ -87,6 +89,33 @@
                     app:civ_shadow_radius="10"
                     tools:layout_editor_absoluteX="132dp"
                     tools:layout_editor_absoluteY="140dp" />
+
+                <ProgressBar
+                    android:id="@+id/edit_profile_picture_progress_bar"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignStart="@+id/imgProfilePicture"
+                    android:layout_alignTop="@+id/imgProfilePicture"
+                    android:layout_alignEnd="@+id/imgProfilePicture"
+                    android:layout_alignBottom="@+id/imgProfilePicture"
+                    android:layout_marginStart="60dp"
+                    android:layout_marginTop="60dp"
+                    android:layout_marginEnd="60dp"
+                    android:layout_marginBottom="60dp"
+                    android:visibility="invisible" />
+
+                <ProgressBar
+                    android:id="@+id/edit_cover_picture_progress_bar"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignStart="@+id/imgCoverPicture"
+                    android:layout_alignTop="@+id/imgCoverPicture"
+                    android:layout_alignEnd="@+id/imgCoverPicture"
+                    android:layout_alignBottom="@+id/imgCoverPicture"
+                    android:layout_margin="80dp"
+                    android:visibility="invisible" />
 
             </RelativeLayout>
 
@@ -207,6 +236,8 @@
 
 
     </ScrollView>
+
+
 
 
 </android.support.constraint.ConstraintLayout>

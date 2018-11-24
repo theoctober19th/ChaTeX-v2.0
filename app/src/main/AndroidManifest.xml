@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.thecoffeecoders.chatex">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
@@ -9,6 +10,10 @@
 
     <!-- Permission for using internet -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 
     <application
         android:name=".ChatexChatApplication"
@@ -63,6 +68,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".auth.ForgotPasswordActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"/>
+
     </application>
 
 </manifest>
