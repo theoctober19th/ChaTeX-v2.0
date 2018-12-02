@@ -31,7 +31,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.thecoffeecoders.chatex.chat.GroupChatActivity;
@@ -252,7 +251,7 @@ public class AddGroupActivity extends AppCompatActivity {
         }
 
         public void setProfilePicture(String profilePicURI){
-            CircularImageView profilePicture = mView.findViewById(R.id.user_single_image);
+            CircularImageView profilePicture = mView.findViewById(R.id.friend_single_image);
 
             RequestOptions requestOptions = new RequestOptions()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)

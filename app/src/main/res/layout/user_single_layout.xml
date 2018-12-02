@@ -8,7 +8,7 @@
     android:padding="5dp">
 
     <com.mikhaellopez.circularimageview.CircularImageView
-        android:id="@+id/user_single_image"
+        android:id="@+id/friend_single_image"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:src="@drawable/img_profile_picture_placeholder_female" />
@@ -17,9 +17,10 @@
         android:id="@+id/user_single_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/user_single_image"
+        android:layout_alignTop="@+id/friend_single_image"
         android:layout_marginStart="20dp"
-        android:layout_toEndOf="@+id/user_single_image"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@+id/friend_single_image"
         android:text="Name"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
@@ -31,33 +32,45 @@
         android:layout_alignTop="@+id/user_single_name"
         android:layout_alignBottom="@+id/user_single_name"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="7dp"
         android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/user_single_name"
+        android:paddingTop="5dp"
         android:text="username" />
 
     <TextView
         android:id="@+id/user_single_bio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
         android:layout_below="@+id/user_single_name"
         android:layout_marginStart="19dp"
         android:layout_marginTop="4dp"
-        android:layout_toEndOf="@+id/user_single_image"
+        android:layout_toStartOf="@+id/user_single_date"
+        android:layout_toEndOf="@+id/friend_single_image"
         android:text="Bio" />
 
     <com.mikhaellopez.circularimageview.CircularImageView
         android:id="@+id/user_single_online_icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_alignStart="@+id/user_single_image"
-        android:layout_alignTop="@+id/user_single_image"
-        android:layout_alignEnd="@+id/user_single_image"
-        android:layout_alignBottom="@+id/user_single_image"
+        android:layout_alignStart="@+id/friend_single_image"
+        android:layout_alignTop="@+id/friend_single_image"
+        android:layout_alignEnd="@+id/friend_single_image"
+        android:layout_alignBottom="@+id/friend_single_image"
         android:layout_marginStart="44dp"
         android:layout_marginTop="44dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:src="@drawable/ic_online_green_dot" />
+
+    <TextView
+        android:id="@+id/user_single_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/user_single_username"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="26dp"
+        android:text="TextView" />
 
 </RelativeLayout>

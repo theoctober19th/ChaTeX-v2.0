@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -36,6 +38,7 @@ import com.thecoffeecoders.chatex.chat.ChatActivity;
 import com.thecoffeecoders.chatex.chat.GroupChatActivity;
 import com.thecoffeecoders.chatex.models.Friend;
 import com.thecoffeecoders.chatex.models.Group;
+import com.thecoffeecoders.chatex.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -162,6 +165,9 @@ public class GroupsFragment extends Fragment {
                                     .applyDefaultRequestOptions(requestOptions)
                                     .load(model.getGroupPicURI())
                                     .into(holder.mGroupPhoto);
+                        }else{
+                            TextDrawable letterDrawable = Utils.getTextDrawable(model.getName(), model.getId(), "rectangle");
+                            holder.mGroupPhoto.setImageDrawable(letterDrawable);
                         }
                         if(model.getName() != null){
                             holder.mGroupName.setText(model.getName());
@@ -185,7 +191,6 @@ public class GroupsFragment extends Fragment {
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 });
-
             }
 
             @NonNull

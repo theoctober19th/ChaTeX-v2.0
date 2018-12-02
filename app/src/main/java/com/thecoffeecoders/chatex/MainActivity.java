@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -120,6 +121,15 @@ public class MainActivity extends AppCompatActivity
             new DownloadUserDataAndUpdateUITask().execute();
             //updateHeaderWithInfo();
         }
+
+        profilePictureImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent editProfileIntent = new Intent(MainActivity.this, EditProfileActivity.class);
+                editProfileIntent.putExtra("isNew", false);
+                startActivity(editProfileIntent);
+            }
+        });
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.navdrawer_screen_area, new ChatFragment());

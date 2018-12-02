@@ -128,15 +128,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
         genderSpinner.setOnItemSelectedListener(this);
 
         bundleExtras = getIntent().getExtras();
-        if(bundleExtras != null){
-            if(bundleExtras.getBoolean("isNew")){
-                new PopulateFormWithUserDataFromProvider().execute();
-                //emailEditText.setEnabled(false);
-            } else{
-                //Old user (not new)
-                //a user may come here if he wants to change his profile after he has already started to use app
-            }
-        }
+        new PopulateFormWithUserDataFromProvider().execute();
     }
 
     @Override
@@ -200,6 +192,7 @@ public class EditProfileActivity extends AppCompatActivity implements AdapterVie
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(dataSnapshot.exists()){
                                 user = dataSnapshot.getValue(User.class);
+                                Log.w("firebasedatabase", user.getUsername());
                             }
                         }
 

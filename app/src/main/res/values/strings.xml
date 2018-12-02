@@ -32,4 +32,5 @@
         <item>Female</item>
         <item>Other</item>
     </string-array>
+    <string name="title_send_location_activity">Send Location</string>
 </resources>

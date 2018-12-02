@@ -7,39 +7,112 @@
     tools:context=".chat.ChatActivity">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/chatMessageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@id/chat_input_layout"
         app:layout_constraintTop_toTopOf="parent"></android.support.v7.widget.RecyclerView>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+
+        android:id="@+id/chat_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
-            android:layout_width="25dp"
-            android:layout_height="27dp"
-            android:layout_margin="5dp"
-            android:layout_marginStart="10dp"
-            android:src="@drawable/ic_plus" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabAddChatExtension"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="showPopup"
+            android:src="@drawable/ic_plus_white"
+            app:fabSize="mini" />
 
         <EditText
-            android:layout_width="301dp"
-            android:layout_height="wrap_content"
-            android:hint="Type a message.." />
-
-        <ImageButton
+            android:id="@+id/et_chatmessage"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_menu_send" />
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/rounded_edittext"
+            android:fontFamily="@font/nunito_light"
+            android:hint="Type a message.."
+            android:maxLines="4"
+            android:padding="8dp"
+            android:textSize="16sp"
+            android:minLines="2"
+            android:layout_weight="1"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabSendMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_menu_send"/>
+
+        <!--<ImageButton-->
+            <!--android:id="@+id/ib_sendmessage"-->
+            <!--android:layout_width="38dp"-->
+            <!--android:layout_height="38dp"-->
+            <!--android:src="@drawable/ic_menu_send"-->
+            <!--android:background="@drawable/circular_button"-->
+            <!--android:layout_weight=""/>-->
+
 
     </LinearLayout>
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/request_options_layout"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:visibility="gone"-->
+        <!--app:layout_constraintBottom_toTopOf="@id/chat_input_layout"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent">-->
+
+        <!--<Button-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:background="@drawable/rounded_button"-->
+            <!--android:text="Decline" />-->
+
+        <!--<Button-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:background="@drawable/rounded_button"-->
+            <!--android:text="Reply" />-->
+    <!--</LinearLayout>-->
+
+    <ProgressBar
+        android:id="@+id/chat_activity_progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="74dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
