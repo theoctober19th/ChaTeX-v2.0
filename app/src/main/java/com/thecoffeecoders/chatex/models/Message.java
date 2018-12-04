@@ -4,6 +4,7 @@ public class Message {
     private String content;
     private String sender;
     private long timestamp;
+    private String type;
 
 
     public Message() {
@@ -31,5 +32,13 @@ public class Message {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

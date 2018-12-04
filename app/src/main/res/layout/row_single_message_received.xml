@@ -13,25 +13,67 @@
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:onClick="openProfile"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/user_single_textmessage_other"
+    <RelativeLayout
+        android:id="@+id/received_message_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:background="@drawable/rounded_rectangle_for_received_message"
-        android:fontFamily="@font/nunito_light"
-        android:maxWidth="240dp"
-        android:padding="8dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:text="hi man, how are you?"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toRightOf="@+id/user_single_profilepic_other"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/user_single_profilepic_other">
+
+        <TextView
+            android:id="@+id/user_single_textmessage_other"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:background="@drawable/rounded_rectangle_for_received_message"
+            android:fontFamily="@font/nunito_light"
+            android:maxWidth="240dp"
+            android:padding="8dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="hi man, how are you?"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/user_single_imagemessage_other"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:adjustViewBounds="true"
+            android:maxWidth="300dp"
+            android:maxHeight="400dp"
+            android:minWidth="200dp"
+            android:minHeight="200dp"
+            android:scaleType="centerInside"
+            android:visibility="gone"/>
+
+       <ScrollView
+           android:layout_width="250dp"
+           android:layout_height="wrap_content"
+           android:padding="10dp"
+           android:id="@+id/mathview_container_other"
+           android:layout_alignParentLeft="true"
+           android:visibility="gone"
+           android:background="@drawable/rounded_rectangle_for_received_message">
+
+           <katex.hourglass.in.mathlib.MathView
+               android:id="@+id/mathmessage_other"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_alignParentLeft="true"
+               android:layout_alignParentTop="true"
+               android:visibility="visible"
+               android:layout_marginLeft="8dp"></katex.hourglass.in.mathlib.MathView>
+
+       </ScrollView>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/user_single_time_other"
@@ -40,9 +82,9 @@
         android:layout_marginLeft="8dp"
         android:text="11:40"
         android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@+id/user_single_textmessage_other"
-        app:layout_constraintLeft_toRightOf="@+id/user_single_textmessage_other"
-        app:layout_constraintTop_toTopOf="@+id/user_single_textmessage_other"
+        app:layout_constraintBottom_toBottomOf="@+id/received_message_container"
+        app:layout_constraintLeft_toRightOf="@+id/received_message_container"
+        app:layout_constraintTop_toTopOf="@+id/received_message_container"
         app:layout_constraintVertical_bias="0.476" />
 
 </android.support.constraint.ConstraintLayout>

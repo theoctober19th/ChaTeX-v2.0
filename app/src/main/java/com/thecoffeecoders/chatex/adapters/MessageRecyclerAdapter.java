@@ -1,11 +1,17 @@
 package com.thecoffeecoders.chatex.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -23,6 +29,12 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.models.Message;
 import com.thecoffeecoders.chatex.utils.Utils;
+
+import java.io.IOException;
+
+import katex.hourglass.in.mathlib.MathView;
+
+//import io.github.kexanie.library.MathView;
 
 public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, RecyclerView.ViewHolder> {
 
@@ -95,7 +107,11 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
         CircularImageView profileImageThumb;
         TextView textMessage;
         TextView receivedTime;
+        ImageView imageMessageImgView;
+        MathView mathView;
         Context context;
+        ProgressBar progressBar;
+        ScrollView mathContainer;
         View mView;
 
         public ReceivedMessageHolder(@NonNull View itemView) {
@@ -105,19 +121,43 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
             profileImageThumb = mView.findViewById(R.id.user_single_profilepic_other);
             textMessage = mView.findViewById(R.id.user_single_textmessage_other);
             receivedTime = mView.findViewById(R.id.user_single_time_other);
+            imageMessageImgView = mView.findViewById(R.id.user_single_imagemessage_other);
+            mathContainer = mView.findViewById(R.id.mathview_container_other);
+            mathView = mView.findViewById(R.id.mathmessage_other);
         }
 
         private void bind(Message message, String profilePicURI){
             context = mView.getContext();
 
+            String messageType = message.getType();
+            String content = message.getContent();
+            if(messageType.equals("text")){
+                textMessage.setText(content);
+                textMessage.setVisibility(View.VISIBLE);
+            }else if(messageType.equals("image")){
+
+                RequestOptions requestOptions = new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL);
+                Glide.with(context)
+                        .applyDefaultRequestOptions(requestOptions)
+                        .load(content)
+                        .into(imageMessageImgView);
+
+                imageMessageImgView.setVisibility(View.VISIBLE);
+
+            }else if(messageType.equals("math")){
+                mathView.setDisplayText("$" + content + "$");
+                mathView.setVisibility(View.VISIBLE);
+                mathContainer.setVisibility(View.VISIBLE);
+
+            }
+
             RequestOptions requestOptions = new RequestOptions()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.img_cover_photo_placeholder);
+                    .diskCacheStrategy(DiskCacheStrategy.ALL);
             Glide.with(context)
                     .applyDefaultRequestOptions(requestOptions)
                     .load(profilePicURI)
                     .into(profileImageThumb);
-            textMessage.setText(message.getContent());
             String recievedTime = Utils.convertTimestampToDate(message.getTimestamp());
             receivedTime.setText(recievedTime);
         }
@@ -129,6 +169,10 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
 
         TextView textMessage;
         TextView sentTime;
+        ProgressBar progressBar;
+        ImageView imageMessage;
+        MathView mathView;
+        ScrollView mathContainer;
         Context context;
         View mView;
 
@@ -139,12 +183,31 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
 
             textMessage = itemView.findViewById(R.id.user_single_textmessage_thisuser);
             sentTime = itemView.findViewById(R.id.user_single_time_thisuser);
+            progressBar = mView.findViewById(R.id.sent_message_progress_bar);
+            imageMessage = itemView.findViewById(R.id.user_single_imagemessage_this);
+            mathView = itemView.findViewById(R.id.mathmessage_this);
+            mathContainer = itemView.findViewById(R.id.mathview_container_this);
         }
 
         private void bind(Message message){
-            textMessage.setText(message.getContent());
+            if(message.getType().equals("text")){
+                textMessage.setText(message.getContent());
+                textMessage.setVisibility(View.VISIBLE);
+            }else if(message.getType().equals("image")){
+                RequestOptions requestOptions = new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL);
+                Glide.with(context)
+                        .applyDefaultRequestOptions(requestOptions)
+                        .load(message.getContent())
+                        .into(imageMessage);
+            }else if(message.getType().equals("math")){
+                mathView.setDisplayText("$" + message.getContent() + "$");
+                mathContainer.setVisibility(View.VISIBLE);
+                mathView.setVisibility(View.VISIBLE);
+            }
             String time = Utils.convertTimestampToDate(message.getTimestamp());
             sentTime.setText(time);
+            progressBar.setVisibility(ProgressBar.GONE);
         }
     }
 }

@@ -1,6 +1,15 @@
 package com.thecoffeecoders.chatex.utils;
 
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -8,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -84,5 +94,19 @@ public class Utils {
         }
         return textDrawable;
 
+    }
+
+    public static Bitmap getRoundedImage(Context context, String uriString) throws IOException {
+//        Uri imageUri = Uri.parse(uriString);
+//        Bitmap original = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+//        Bitmap imageRounded = Bitmap.createBitmap(original.getWidth(), original.getHeight(), original.getConfig());
+//        Canvas canvas = new Canvas(imageRounded);
+//        Paint mpaint = new Paint();
+//        mpaint.setAntiAlias(true);
+//        mpaint.setShader(new BitmapShader(original, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
+//        canvas.drawRoundRect((new RectF(0, 0, original.getWidth(), original.getHeight())), 100, 100, mpaint);// Round Image Corner 100 100 100 100
+//        return imageRounded;
+
+        return null;
     }
 }

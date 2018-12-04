@@ -1,7 +1,9 @@
 package com.thecoffeecoders.chatex.chat;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,12 +33,17 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.adapters.MessageRecyclerAdapter;
+import com.thecoffeecoders.chatex.math.WriteEquationActivity;
 import com.thecoffeecoders.chatex.misc.SendLocation;
 import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Message;
 import com.thecoffeecoders.chatex.models.Request;
 import com.thecoffeecoders.chatex.users.UserProfileActivity;
-import com.thecoffeecoders.chatex.utils.Utils;
+//import com.thecoffeecoders.chatex.utils.Utils;
+//import com.zhihu.matisse.Matisse;
+//import com.zhihu.matisse.MimeType;
+//import com.zhihu.matisse.engine.impl.GlideEngine;
+//import com.zhihu.matisse.filter.Filter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -64,6 +71,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private static String POPUP_CONSTANT = "mPopup";
     private static String POPUP_FORCE_SHOW_ICON = "setForceShowIcon";
+    private int RC_LATEX_EQUATION;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +84,10 @@ public class ChatActivity extends AppCompatActivity {
         mSendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMessage();
+                String messageContent = mTypeMessageEditText.getText().toString();
+                if(!TextUtils.isEmpty(messageContent)){
+                    sendMessage(messageContent, "text");
+                }
             }
         });
         mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -166,11 +177,11 @@ public class ChatActivity extends AppCompatActivity {
         currentUserID = mUser.getUid();
     }
 
-    private void sendMessage() {
-        String messageContent = mTypeMessageEditText.getText().toString();
+    private void sendMessage(String messageContent, String type) {
         if(!TextUtils.isEmpty(messageContent)){
             final Message message = new Message();
             message.setContent(messageContent);
+            message.setType(type);
             message.setSender(currentUserID);
             message.setTimestamp(System.currentTimeMillis());
 
@@ -193,11 +204,11 @@ public class ChatActivity extends AppCompatActivity {
             final DatabaseReference requestRef1 = FirebaseDatabase
                     .getInstance()
                     .getReference()
-                    .child("chat").child(otherUserID).child(currentUserID);
+                    .child("requests").child(otherUserID).child(currentUserID);
             final DatabaseReference requestRef2 = FirebaseDatabase
                     .getInstance()
                     .getReference()
-                    .child("chat").child(currentUserID).child(otherUserID);
+                    .child("requests").child(currentUserID).child(otherUserID);
 
             final String key = msgRef1.push().getKey();
 
@@ -228,7 +239,7 @@ public class ChatActivity extends AppCompatActivity {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
                                                             if(task.isSuccessful()){
-                                                                clearInput();
+
                                                             }
                                                         }
                                                     });
@@ -246,7 +257,7 @@ public class ChatActivity extends AppCompatActivity {
                                                 requestRef1.setValue(receivedRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
-                                                        clearInput();
+
                                                     }
                                                 });
                                             }
@@ -260,6 +271,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
+        clearInput();
     }
 
     public void openProfile(View view){
@@ -270,7 +282,6 @@ public class ChatActivity extends AppCompatActivity {
 
     public void clearInput(){
         mTypeMessageEditText.setText("");
-        Utils.hideKeyboard(ChatActivity.this);
     }
 
     public void showPopup(View view) {
@@ -306,7 +317,8 @@ public class ChatActivity extends AppCompatActivity {
                         startActivity(sendLocationIntent);
                         break;
                     case R.id.ext_menu_math:
-                        Toast.makeText(ChatActivity.this, "Math", Toast.LENGTH_SHORT).show();
+                        Intent writeEquationIntent = new Intent(ChatActivity.this, WriteEquationActivity.class);
+                        startActivityForResult(writeEquationIntent, RC_LATEX_EQUATION);
                         break;
                     case R.id.ext_menu_photo:
                         Toast.makeText(ChatActivity.this, "TODO: Fetch Image From Gallery", Toast.LENGTH_SHORT).show();
@@ -315,5 +327,27 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
         popup.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == RC_LATEX_EQUATION){
+            if(resultCode == RESULT_OK){
+                String latexCode = data.getStringExtra("equation");
+                sendMessage(latexCode, "math");
+            }
+        }
+    }
+
+    public void fetchImageFromDevice(){
+//        Matisse.from(ChatActivity.this)
+//                .choose(MimeType.allOf())
+//                .countable(true)
+//                .maxSelectable(9)
+//                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+//                .thumbnailScale(0.85f)
+//                .imageEngine(new GlideEngine())
+//                .forResult(REQUEST_CODE_CHOOSE);
     }
 }

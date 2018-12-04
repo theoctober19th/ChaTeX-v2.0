@@ -72,7 +72,16 @@ dependencies {
 
     api 'com.theartofdev.edmodo:android-image-cropper:2.5.+'
 
+    //Image picker
+    //implementation 'com.zhihu.android:matisse:0.5.1'
+
     implementation 'id.zelory:compressor:2.1.0'
+
+    //mathview
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //compile 'com.android.support:appcompat-v7:23.0.0'
+    implementation 'io.github.kexanie.library:MathView:0.0.6'
+    implementation 'in.hourglass.mathrender:katexmathview:1.0'
 }
 
 //needed for Firebase to work

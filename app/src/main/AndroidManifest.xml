@@ -20,8 +20,6 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-
-
     <application
         android:name=".ChatexChatApplication"
         android:allowBackup="true"
@@ -95,9 +93,13 @@
 
         <activity
             android:name=".misc.SendLocation"
-            android:label="@string/title_send_location_activity"></activity>
+            android:label="@string/title_send_location_activity" />
 
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <activity android:name=".math.WriteEquationActivity"></activity>
     </application>
 
 </manifest>

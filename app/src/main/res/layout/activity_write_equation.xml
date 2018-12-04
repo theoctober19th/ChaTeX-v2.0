@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".math.WriteEquationActivity">
+
+    <EditText
+        android:id="@+id/et_typed_equation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_edittext"
+        android:fontFamily="@font/nunito_light"
+        android:hint="Type a message.."
+        android:maxLines="4"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:minLines="2"
+        android:layout_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/math_preview_pane"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <io.github.kexanie.library.MathView
+        android:id="@+id/math_preview_pane"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:engine="KaTeX"
+        android:minHeight="300dp">
+
+    </io.github.kexanie.library.MathView>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintTop_toBottomOf="@id/et_typed_equation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+        <GridLayout
+            android:id="@+id/help_buttons_grid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="9"
+            android:rowCount="4"
+            android:elevation="0dp"
+            android:paddingEnd="5dp"
+            android:paddingStart="5dp"
+            android:visibility="visible"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/latex_underscore"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_subscript"
+                android:tag="_"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_square_brackets"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_square_brackets"
+                android:tag="\\left[  \\right]"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_curly_braces"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_curly_brackets"
+                android:tag="{ }"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_parentheses"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_parenthesis"
+                android:elevation="1dp"
+                android:tag="\\left(  \\right)"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_power"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_superscript"
+                android:elevation="1dp"
+                android:tag="^"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_squareRoot"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_root"
+                android:elevation="1dp"
+                android:tag="\\sqrt[ ]{ }"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_integral"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_integral"
+                android:elevation="1dp"
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\int_{ }^{ } " />
+
+            <Button
+                android:id="@+id/latex_absolute"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_absolute"
+                android:elevation="1dp"
+                android:tag="\\left(  \\right)"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_complement"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_complement_bar"
+                android:elevation="1dp"
+                android:tag="\\bar{ }"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_fraction"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_fraction"
+                android:elevation="1dp"
+                android:tag="\\frac{ }{ } "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_greaterThanOrEqualsTo"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_greater_than_or_equals_to"
+                android:elevation="1dp"
+                android:tag="\\geq "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_lessThanOrEqualsTo"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_less_than_or_equals_to"
+                android:elevation="1dp"
+                android:tag="\\leq "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_infinity"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_infinity"
+                android:elevation="1dp"
+                android:tag="\\infty "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_intersection"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_intersection"
+                android:elevation="1dp"
+                android:tag="\\bigcap "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_union"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_union"
+                android:elevation="1dp"
+                android:tag="\\bigcup "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_limit"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_limit"
+                android:elevation="1dp"
+                android:tag="\\lim_{{x} \\rightarrow {a}} "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_not_equal"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_not_equal"
+                android:elevation="1dp"
+                android:tag="\\neq "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_partialDerivatives"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_partial_derivative"
+                android:elevation="1dp"
+                android:tag="\\frac{\\partial^{ } }{\\partial { }^{ }} "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_plusOrMinus"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_plus_or_minus"
+                android:elevation="1dp"
+                android:tag="\\pm "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_doubleArrow"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_rightarrow_double"
+                android:elevation="1dp"
+                android:tag="\\Rightarrow "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_singleArrow"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_rightarrow_single"
+                android:elevation="1dp"
+                android:tag="\\rightarrow "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_summation"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_summation"
+                android:elevation="1dp"
+                android:tag="\\sum_{x = a}^{b} "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_triangleDown"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_triangle_down"
+                android:elevation="1dp"
+                android:tag="\\bigtriangledown "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_triangleUp"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_triangle_up"
+                android:elevation="1dp"
+                android:tag="\\bigtriangleup "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_vector"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_vector"
+                android:elevation="1dp"
+                android:tag="\\vec{ } "
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_back_slash"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_backslash"
+                android:elevation="1dp"
+                android:tag=" \\"
+                android:onClick="onLatexButtonClicked"/>
+
+            <Button
+                android:id="@+id/latex_clear"
+                android:layout_width="@dimen/latex_button_width"
+                android:layout_height="@dimen/latex_button_height"
+                android:background="@drawable/math_clear"
+                android:elevation="1dp" />
+
+        </GridLayout>
+
+    </HorizontalScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_send_equation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        app:fabSize="normal"
+        android:src="@drawable/ic_menu_send"
+        />
+
+
+
+</android.support.constraint.ConstraintLayout>
