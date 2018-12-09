@@ -12,7 +12,7 @@
 
         <!-- TODO: Update blank fragment layout -->
 
-        <android.support.v7.widget.RecyclerView
+        <com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView
             android:id="@+id/group_list_recyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -23,18 +23,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></android.support.v7.widget.RecyclerView>
+            app:layout_constraintTop_toTopOf="parent"></com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/add_group_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="@+id/group_list_recyclerView"
-            app:layout_constraintEnd_toEndOf="@+id/group_list_recyclerView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_plus_white" />
 
         <ProgressBar
@@ -52,6 +49,71 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/fragment_group_empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/img_group_empty_view"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/imageView"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginTop="24dp"
+                android:text="You haven't joined any group yet."
+                android:fontFamily="@font/nunito_light"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/textView1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:text="Click the + button below to create new group."
+                android:fontFamily="@font/nunito_light"
+                android:textSize="14sp"
+                android:gravity="center"/>
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:adjustViewBounds="true"
+                android:layout_height="100dp"
+                android:layout_marginRight="96dp"
+                android:layout_marginBottom="24dp"
+                android:src="@drawable/img_curved_arrow"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+        </android.support.constraint.ConstraintLayout>
 
     </android.support.constraint.ConstraintLayout>
 

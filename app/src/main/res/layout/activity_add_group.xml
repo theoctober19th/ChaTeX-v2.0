@@ -50,7 +50,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
-    <android.support.v7.widget.RecyclerView
+    <com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView
         android:id="@+id/add_group_friend_list_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -62,16 +62,61 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"></android.support.v7.widget.RecyclerView>
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+    </com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/activity_add_group_empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/add_group_friend_list_recyclerview"
+        app:layout_constraintLeft_toLeftOf="@id/add_group_friend_list_recyclerview"
+        app:layout_constraintRight_toRightOf="@id/add_group_friend_list_recyclerview"
+        app:layout_constraintBottom_toBottomOf="@id/add_group_friend_list_recyclerview">
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="24dp"
+            android:text="Your Friend List is Empty."
+            android:fontFamily="@font/nunito_light"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textStyle="bold"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+
+    <ProgressBar
+        android:id="@+id/add_group_activity_progress_bar"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/add_group_friend_list_recyclerview"
+        app:layout_constraintEnd_toEndOf="@id/add_group_friend_list_recyclerview"
+        app:layout_constraintStart_toStartOf="@id/add_group_friend_list_recyclerview"
+        app:layout_constraintTop_toTopOf="@id/add_group_friend_list_recyclerview"
+        android:visibility="gone"/>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_group_fab"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_tick_material_green"
-        android:src="@drawable/ic_tick_material_green"
+        android:src="@drawable/ic_check_white_24dp"
         app:layout_constraintBottom_toBottomOf="@+id/add_group_friend_list_recyclerview"
         app:layout_constraintEnd_toEndOf="@+id/add_group_friend_list_recyclerview" />
 </android.support.constraint.ConstraintLayout>

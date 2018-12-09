@@ -46,8 +46,10 @@ public class GroupRecyclerAdapter extends FirebaseRecyclerAdapter<Boolean, Group
         mGroupRef.child(key).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                final Group model = dataSnapshot.getValue(Group.class);
-                holder.bind(model);
+                if(dataSnapshot.exists()){
+                    final Group model = dataSnapshot.getValue(Group.class);
+                    holder.bind(model);
+                }
             }
 
             @Override

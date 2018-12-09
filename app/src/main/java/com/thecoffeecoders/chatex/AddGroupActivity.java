@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,19 +34,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.thecoffeecoders.chatex.adapters.AddGroupFriendAdapter;
+import com.thecoffeecoders.chatex.adapters.FriendRecyclerAdapter;
 import com.thecoffeecoders.chatex.chat.GroupChatActivity;
+import com.thecoffeecoders.chatex.interfaces.OnAdapterItemClicked;
 import com.thecoffeecoders.chatex.models.Friend;
 import com.thecoffeecoders.chatex.models.Group;
+import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AddGroupActivity extends AppCompatActivity {
+public class AddGroupActivity extends AppCompatActivity implements OnAdapterItemClicked {
 
     //Layout fields
     CircularImageView mGroupPhotoImgView;
     EditText mGroupNameEditText;
-    RecyclerView mFriendListRecyclerView;
+    RecyclerViewWithEmptyView mFriendListRecyclerView;
     FloatingActionButton mAddGroupBtn;
 
     //Firebase Objects
@@ -69,6 +74,8 @@ public class AddGroupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group);
 
+
+
         initializeLayoutFieldsAndFirebaseObjects();
         mGroup = new Group();
         mAddGroupBtn.setOnClickListener(new View.OnClickListener() {
@@ -84,12 +91,15 @@ public class AddGroupActivity extends AppCompatActivity {
         if(TextUtils.isEmpty(mGroupNameEditText.getText())){
             Toast.makeText(this, "Please enter the group name.", Toast.LENGTH_SHORT).show();
             return;
-        }else{
+        }else if(membersMap.size() < 1 ){
+            Toast.makeText(this, "Add at least one other person", Toast.LENGTH_SHORT).show();
+            return;
+        } else{
             groupName = mGroupNameEditText.getText().toString();
         }
         mGroup.setName(groupName);
         mGroup.setMemberCount(userCount);
-        mGroup.setGroupPicURI("https://us.123rf.com/450wm/yurich84/yurich841805/yurich84180500120/102048648-html-header-markup-extreme-close-up-coding-and-programming-concept.jpg?ver=6");
+        //mGroup.setGroupPicURI("https://us.123rf.com/450wm/yurich84/yurich841805/yurich84180500120/102048648-html-header-markup-extreme-close-up-coding-and-programming-concept.jpg?ver=6");
         mGroup.setCreated(System.currentTimeMillis());
         membersMap.put(mUser.getUid(), memberInfoMap);
         final String groupKey = mGroupRef.push().getKey();
@@ -147,53 +157,53 @@ public class AddGroupActivity extends AppCompatActivity {
     }
 
     private void addFirebaseAdapterForFriendList(){
-        //FirebaseRecyclerAdapter
         FirebaseRecyclerOptions<Friend> options = new FirebaseRecyclerOptions.Builder<Friend>()
                 .setQuery(mFriendsRef, Friend.class)
                 .build();
 
-        mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Friend, FriendsViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull final FriendsViewHolder holder, int position, @NonNull Friend model) {
-                holder.setFriendsSince(model.getSince());
-
-                final String list_user_id = getRef(position).getKey();
-                Log.d("bikalpa", list_user_id);
-                mUserRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        final String username = dataSnapshot.child("username").getValue().toString();
-                        String profilePicURI = dataSnapshot.child("profilePicURI").getValue().toString();
-                        String online = dataSnapshot.child("onlineStatus").getValue().toString();
-                        String displayName = dataSnapshot.child("displayName").getValue().toString();
-                        holder.setDisplayName(displayName);
-                        holder.setUserName(username);
-                        holder.setProfilePicture(profilePicURI);
-                        holder.setOnline(online);
-                        holder.mView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                holder.changeSelected(list_user_id);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-            }
-
-
-            @NonNull
-            @Override
-            public FriendsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                View view = LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.user_single_layout, viewGroup, false);
-
-                return new FriendsViewHolder(view);
-            }
-        };
+        mFirebaseRecyclerAdapter = new AddGroupFriendAdapter(options, this);
+//        mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Friend, FriendsViewHolder>(options) {
+//            @Override
+//            protected void onBindViewHolder(@NonNull final FriendsViewHolder holder, int position, @NonNull Friend model) {
+//                holder.setFriendsSince(model.getSince());
+//
+//                final String list_user_id = getRef(position).getKey();
+//                Log.d("bikalpa", list_user_id);
+//                mUserRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                        final String username = dataSnapshot.child("username").getValue().toString();
+//                        String profilePicURI = dataSnapshot.child("profilePicURI").getValue().toString();
+//                        String online = dataSnapshot.child("onlineStatus").getValue().toString();
+//                        String displayName = dataSnapshot.child("displayName").getValue().toString();
+//                        holder.setDisplayName(displayName);
+//                        holder.setUserName(username);
+//                        holder.setProfilePicture(profilePicURI);
+//                        holder.setOnline(online);
+//                        holder.mView.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                holder.changeSelected(list_user_id);
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//                    }
+//                });
+//            }
+//
+//
+//            @NonNull
+//            @Override
+//            public FriendsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+//                View view = LayoutInflater.from(viewGroup.getContext())
+//                        .inflate(R.layout.user_single_layout, viewGroup, false);
+//
+//                return new FriendsViewHolder(view);
+//            }
+//        };
         mFriendListRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
     }
 
@@ -201,8 +211,10 @@ public class AddGroupActivity extends AppCompatActivity {
         mGroupPhotoImgView = findViewById(R.id.add_group_group_picture);
         mGroupNameEditText = findViewById(R.id.add_group_group_name_et);
         mAddGroupBtn = findViewById(R.id.add_group_fab);
-        mFriendListRecyclerView = findViewById(R.id.add_group_friend_list_recyclerview);
+        mFriendListRecyclerView = (RecyclerViewWithEmptyView) findViewById(R.id.add_group_friend_list_recyclerview);
         mFriendListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        View emptyView = findViewById(R.id.activity_add_group_empty_view);
+        mFriendListRecyclerView.setEmptyView(emptyView);
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -216,74 +228,15 @@ public class AddGroupActivity extends AppCompatActivity {
         memberInfoMap.put("nickname", "");
     }
 
-    public class FriendsViewHolder extends RecyclerView.ViewHolder {
-        private View mView;
-        private boolean isSelected;
-
-        public FriendsViewHolder(@NonNull View itemView) {
-            super(itemView);
-            mView = itemView;
-            isSelected = false;
-        }
-
-        public void setDisplayName(String displayName){
-            TextView nameTextView = (TextView)mView.findViewById(R.id.user_single_name);
-            nameTextView.setText(displayName);
-        }
-
-        public void setFriendsSince(String since){
-            TextView dateTextView = (TextView)mView.findViewById(R.id.user_single_bio);
-            dateTextView.setText(since);
-        }
-
-        public void setUserName(String userName){
-            TextView usernameTextView = (TextView)mView.findViewById(R.id.user_single_username);
-            usernameTextView.setText(userName);
-        }
-
-        public void setOnline(String online){
-            CircularImageView onlineIcon = (CircularImageView)mView.findViewById(R.id.user_single_online_icon);
-            if (online.equals("true")){
-                onlineIcon.setVisibility(View.VISIBLE);
-            }else{
-                onlineIcon.setVisibility(View.INVISIBLE);
-            }
-        }
-
-        public void setProfilePicture(String profilePicURI){
-            CircularImageView profilePicture = mView.findViewById(R.id.friend_single_image);
-
-            RequestOptions requestOptions = new RequestOptions()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.img_profile_picture_placeholder_female);
-            Glide.with(AddGroupActivity.this)
-                    .applyDefaultRequestOptions(requestOptions)
-                    .load(profilePicURI)
-                    .into(profilePicture);
-        }
-
-        public void setSelected(){
-            RelativeLayout singleUserLayout = mView.findViewById(R.id.user_single_layout);
-            singleUserLayout.setBackgroundColor(Color.LTGRAY);
-        }
-
-        public void removeSelected(){
-            RelativeLayout singleUserLayout = mView.findViewById(R.id.user_single_layout);
-            singleUserLayout.setBackgroundColor(Color.TRANSPARENT);
-        }
-
-        public void changeSelected(String userID){
-            if(isSelected){
-                removeSelected();
-                isSelected = false;
-                membersMap.remove(userID);
-                userCount--;
-            }else{
-                setSelected();
-                isSelected = true;
-                userCount++;
-                membersMap.put(userID, memberInfoMap);
-            }
+    @Override
+    public void onAdapterItemClicked(String value) {
+        Log.d("uid_clicked", value);
+        if(membersMap.containsKey(value)){
+            membersMap.remove(value);
+            userCount --;
+        }else{
+            userCount ++;
+            membersMap.put(value, memberInfoMap);
         }
     }
 

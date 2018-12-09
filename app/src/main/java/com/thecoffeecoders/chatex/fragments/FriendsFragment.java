@@ -34,19 +34,10 @@ import com.thecoffeecoders.chatex.adapters.FriendRecyclerAdapter;
 import com.thecoffeecoders.chatex.chat.ChatActivity;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.models.Friend;
+import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
 
 public class FriendsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
-
 
     //Firebase objects
     FirebaseAuth mAuth;
@@ -57,7 +48,7 @@ public class FriendsFragment extends Fragment {
     private View mMainView;
     ProgressBar mProgressBar;
     //RecyclerView
-    private RecyclerView mFriendList;
+    private RecyclerViewWithEmptyView mFriendList;
     FriendRecyclerAdapter mFriendRecyclerAdapter;
 
     public FriendsFragment() {
@@ -66,20 +57,12 @@ public class FriendsFragment extends Fragment {
 
     public static FriendsFragment newInstance(String param1, String param2) {
         FriendsFragment fragment = new FriendsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -104,9 +87,10 @@ public class FriendsFragment extends Fragment {
         mUserRef.keepSynced(true);
 
         //RecyclerView instantiation
-        mFriendList = (RecyclerView)mMainView.findViewById(R.id.friends_list_recycler_view);
-        //mFriendList.setHasFixedSize(true);
+        mFriendList = (RecyclerViewWithEmptyView) mMainView.findViewById(R.id.friends_list_recycler_view);
         mFriendList.setLayoutManager(new LinearLayoutManager(getContext()));
+        View emptyView = mMainView.findViewById(R.id.fragment_friends_empty_view);
+        mFriendList.setEmptyView(emptyView);
 
         return mMainView;
 

@@ -69,6 +69,7 @@ public class FriendRecyclerAdapter extends FirebaseRecyclerAdapter<Friend, Frien
                         //take user to UserProfileActivity
                         Intent chatIntent = new Intent(holder.context, ChatActivity.class);
                         chatIntent.putExtra("uid", list_user_id);
+                        chatIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         holder.context.startActivity(chatIntent);
                     }
                 });
@@ -106,7 +107,7 @@ public class FriendRecyclerAdapter extends FirebaseRecyclerAdapter<Friend, Frien
         public FriendsViewHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
-            context = mView.getContext();
+            context = mView.getContext().getApplicationContext();
         }
 
         public void setLastOnlineDate(long timestamp){

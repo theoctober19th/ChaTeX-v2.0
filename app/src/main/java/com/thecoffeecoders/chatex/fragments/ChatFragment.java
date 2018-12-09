@@ -22,13 +22,14 @@ import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.adapters.ChatRecyclerAdapter;
 import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Friend;
+import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
 
 public class ChatFragment extends Fragment {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
+//    private static final String ARG_PARAM1 = "param1";
+//    private static final String ARG_PARAM2 = "param2";
+//
+//    private String mParam1;
+//    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -41,7 +42,8 @@ public class ChatFragment extends Fragment {
 //    DatabaseReference
 
     //Views and stuffs
-    RecyclerView mChatListRecyclerView;
+    //RecyclerView mChatListRecyclerView;
+    RecyclerViewWithEmptyView mChatListRecyclerView;
     ChatRecyclerAdapter mChatRecyclerAdapter;
     static ProgressBar mProgressBar;
 
@@ -51,20 +53,20 @@ public class ChatFragment extends Fragment {
 
     public static ChatFragment newInstance(String param1, String param2) {
         ChatFragment fragment = new ChatFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+//        Bundle args = new Bundle();
+//        args.putString(ARG_PARAM1, param1);
+//        args.putString(ARG_PARAM2, param2);
+//        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+//        if (getArguments() != null) {
+//            mParam1 = getArguments().getString(ARG_PARAM1);
+//            mParam2 = getArguments().getString(ARG_PARAM2);
+//        }
     }
 
     public void instantiateFirebaseObjects(){
@@ -80,8 +82,10 @@ public class ChatFragment extends Fragment {
     }
 
     public void initializeViews(View parentView){
-        mChatListRecyclerView = parentView.findViewById(R.id.chat_list_recyclerview);
+        mChatListRecyclerView = (RecyclerViewWithEmptyView) parentView.findViewById(R.id.chat_list_recyclerview);
         mChatListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        View emptyView = parentView.findViewById(R.id.fragment_chat_empty_view);
+        mChatListRecyclerView.setEmptyView(emptyView);
         mProgressBar = parentView.findViewById(R.id.fragment_chat_progress_bar);
     }
 

@@ -338,4 +338,11 @@ public class MainActivity extends AppCompatActivity
             mProgressBar.setVisibility(ProgressBar.GONE);
         }
     }
+
+    public void inflateFindFriendsFragment(View view){
+        Fragment findFriendsFragment = new FindFriendsFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.navdrawer_screen_area, findFriendsFragment);
+        fragmentTransaction.commit();
+    }
 }

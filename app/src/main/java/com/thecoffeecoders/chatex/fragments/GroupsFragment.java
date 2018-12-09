@@ -41,6 +41,7 @@ import com.thecoffeecoders.chatex.chat.GroupChatActivity;
 import com.thecoffeecoders.chatex.models.Friend;
 import com.thecoffeecoders.chatex.models.Group;
 import com.thecoffeecoders.chatex.utils.Utils;
+import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -49,7 +50,8 @@ import java.util.Date;
 public class GroupsFragment extends Fragment {
 
     ProgressBar mProgressBar;
-    RecyclerView mGroupListRecyclerView;
+    //RecyclerView mGroupListRecyclerView;
+    RecyclerViewWithEmptyView mGroupListRecyclerView;
     FirebaseRecyclerAdapter mFirebaseRecyclerAdapter;
 
     DatabaseReference mGroupRef;
@@ -81,12 +83,17 @@ public class GroupsFragment extends Fragment {
         //Set Actionbar title
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Groups");
 
-        mGroupListRecyclerView = aView.findViewById(R.id.group_list_recyclerView);
+        //setting up RecyclerView
+        mGroupListRecyclerView = (RecyclerViewWithEmptyView) aView.findViewById(R.id.group_list_recyclerView);
         mGroupListRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        View emptyView = aView.findViewById(R.id.fragment_group_empty_view);
+        mGroupListRecyclerView.setEmptyView(emptyView);
+
         mProgressBar = aView.findViewById(R.id.fragment_group_progress_bar);
         mProgressBar.setVisibility(View.VISIBLE);
 
         mUserGroupRef = FirebaseDatabase.getInstance().getReference().child("usergroups").child(FirebaseAuth.getInstance().getUid());
+        mUserGroupRef.keepSynced(true);
         mGroupRef = FirebaseDatabase.getInstance().getReference().child("groups");
 
         FloatingActionButton fab = aView.findViewById(R.id.add_group_fab);

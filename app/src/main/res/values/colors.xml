@@ -6,4 +6,5 @@
     <color name="lightest_green">#7cd2a1</color>
     <color name="light_purple_background">#d28eff</color>
     <color name="received_message_background">#eaeaea</color>
+    <color name="colorAccentLight">#ffa726</color>
 </resources>

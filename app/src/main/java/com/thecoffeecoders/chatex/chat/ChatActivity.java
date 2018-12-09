@@ -39,6 +39,7 @@ import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Message;
 import com.thecoffeecoders.chatex.models.Request;
 import com.thecoffeecoders.chatex.users.UserProfileActivity;
+import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
 //import com.thecoffeecoders.chatex.utils.Utils;
 //import com.zhihu.matisse.Matisse;
 //import com.zhihu.matisse.MimeType;
@@ -53,7 +54,7 @@ public class ChatActivity extends AppCompatActivity {
     //Views
     private EditText mTypeMessageEditText;
     private FloatingActionButton mSendImageButton;
-    private RecyclerView mChatRecyclerView;
+    private RecyclerViewWithEmptyView mChatRecyclerView;
     private ProgressBar mProgressBar;
     private FloatingActionButton mChatExtensionBtn;
     private LinearLayout mChatInputLayout;
@@ -90,7 +91,6 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         });
-        mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         checkIfFriends();
         addAdapter();
@@ -158,7 +158,11 @@ public class ChatActivity extends AppCompatActivity {
     private void initializeViews(){
         mTypeMessageEditText = findViewById(R.id.et_chatmessage);
         mSendImageButton = findViewById(R.id.fabSendMessage);
-        mChatRecyclerView = findViewById(R.id.chatMessageRecyclerView);
+        mChatRecyclerView = (RecyclerViewWithEmptyView) findViewById(R.id.chatMessageRecyclerView);
+        mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        View emptyView = findViewById(R.id.activity_chat_empty_view);
+        mChatRecyclerView.setEmptyView(emptyView);
+
         mProgressBar = findViewById(R.id.chat_activity_progress_bar);
         mProgressBar.setVisibility(ProgressBar.VISIBLE);
         mChatInputLayout = findViewById(R.id.chat_input_layout);

@@ -6,12 +6,52 @@
     android:layout_height="match_parent"
     tools:context=".chat.ChatActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView
         android:id="@+id/chatMessageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/chat_input_layout"
-        app:layout_constraintTop_toTopOf="parent"></android.support.v7.widget.RecyclerView>
+        app:layout_constraintTop_toTopOf="parent"></com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/activity_chat_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foregroundGravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:fontFamily="@font/nunito_light"
+            android:gravity="center"
+            android:text="It seems like there's nothing here."
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/nunito_light"
+            android:gravity="center"
+            android:text="Be the first one to say hello :)"
+            android:textSize="14sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView1" />
+        />
+    </android.support.constraint.ConstraintLayout>
 
     <LinearLayout
 
