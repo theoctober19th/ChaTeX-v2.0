@@ -18,10 +18,14 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class Utils {
+
+    static int NOTIFICATION_ID = 0;
 
     static public String convertTimestampToDate(long time) {
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
@@ -108,5 +112,13 @@ public class Utils {
 //        return imageRounded;
 
         return null;
+    }
+
+    public static int createID(){
+        return (int)System.currentTimeMillis()/1000;
+    }
+
+    public static int getUniqueInteger(){
+        return NOTIFICATION_ID++;
     }
 }

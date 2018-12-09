@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -95,6 +96,8 @@ public class FindFriendsFragment extends Fragment {
         // Inflate the layout for this fragment
         mMainView = inflater.inflate(R.layout.fragment_find_friends, container, false);
 
+        //Set Actionbar title
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("User List");
 
         //Firebase objects
         mAuth = FirebaseAuth.getInstance();

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -34,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thecoffeecoders.chatex.AddGroupActivity;
 import com.thecoffeecoders.chatex.R;
+import com.thecoffeecoders.chatex.adapters.GroupRecyclerAdapter;
 import com.thecoffeecoders.chatex.chat.ChatActivity;
 import com.thecoffeecoders.chatex.chat.GroupChatActivity;
 import com.thecoffeecoders.chatex.models.Friend;
@@ -76,6 +78,9 @@ public class GroupsFragment extends Fragment {
         // Inflate the layout for this fragment
         View aView =  inflater.inflate(R.layout.fragment_groups, container, false);
 
+        //Set Actionbar title
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Groups");
+
         mGroupListRecyclerView = aView.findViewById(R.id.group_list_recyclerView);
         mGroupListRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         mProgressBar = aView.findViewById(R.id.fragment_group_progress_bar);
@@ -96,118 +101,13 @@ public class GroupsFragment extends Fragment {
         return aView;
     }
 
-//    private void addFirebaseRecyclerAdapter() {
-//        FirebaseRecyclerOptions<Group> options = new FirebaseRecyclerOptions.Builder<Group>()
-//                .setQuery(mGroupRef, Group.class)
-//                .build();
-//        mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Group, GroupsFragment.GroupsViewHolder>(options) {
-//            @Override
-//            protected void onBindViewHolder(@NonNull final GroupsFragment.GroupsViewHolder holder, int position, @NonNull final Group model) {
-//                RequestOptions requestOptions = new RequestOptions()
-//                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                        .placeholder(R.drawable.img_cover_photo_placeholder);
-//                if(model.getGroupPicURI()!=null){
-//                    Log.d("grouppicuri", model.getGroupPicURI());
-//                    Glide.with(mContext)
-//                            .applyDefaultRequestOptions(requestOptions)
-//                            .load(model.getGroupPicURI())
-//                            .into(holder.mGroupPhoto);
-//                }
-//                if(model.getName() != null){
-//                    holder.mGroupName.setText(model.getName());
-//                }
-//                holder.mMembersInfo.setText(model.getMemberCount() + " members");
-//
-//                Date date = new Date(Long.valueOf(model.getCreated()*1000L));
-//                SimpleDateFormat myDate = new SimpleDateFormat("d MMM yyyy");
-//                String formatted = myDate.format(date);
-//                holder.mCreatedDate.setText("Created on " + formatted);
-//
-//                holder.itemView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        takeToGroupChatActivity(model.getId());
-//                    }
-//                });
-//            }
-//
-//            @NonNull
-//            @Override
-//            public GroupsFragment.GroupsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-//                View view = LayoutInflater.from(viewGroup.getContext())
-//                        .inflate(R.layout.cardview_group_row, viewGroup, false);
-//
-//                return new GroupsFragment.GroupsViewHolder(view);
-//            }
-//        };
-//    }
-
     private void addFirebaseRecyclerAdapter() {
         FirebaseRecyclerOptions<Boolean> options = new FirebaseRecyclerOptions.Builder<Boolean>()
                 .setQuery(mUserGroupRef, Boolean.class)
                 .build();
-        mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Boolean, GroupsFragment.GroupsViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull final GroupsFragment.GroupsViewHolder holder, int position, @NonNull final Boolean bool) {
+        mFirebaseRecyclerAdapter = new GroupRecyclerAdapter(options, mProgressBar);
+        mGroupListRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
 
-                String key = this.getRef(position).getKey();
-                mGroupRef.child(key).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        final Group model = dataSnapshot.getValue(Group.class);
-
-                        RequestOptions requestOptions = new RequestOptions()
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .placeholder(R.drawable.img_cover_photo_placeholder);
-                        if(model.getGroupPicURI()!=null){
-                            Log.d("grouppicuri", model.getGroupPicURI());
-                            Glide.with(mContext)
-                                    .applyDefaultRequestOptions(requestOptions)
-                                    .load(model.getGroupPicURI())
-                                    .into(holder.mGroupPhoto);
-                        }else{
-                            TextDrawable letterDrawable = Utils.getTextDrawable(model.getName(), model.getId(), "rectangle");
-                            holder.mGroupPhoto.setImageDrawable(letterDrawable);
-                        }
-                        if(model.getName() != null){
-                            holder.mGroupName.setText(model.getName());
-                        }
-                        holder.mMembersInfo.setText(model.getMemberCount() + " members");
-
-                        Date date = new Date(Long.valueOf(model.getCreated()*1000L));
-                        SimpleDateFormat myDate = new SimpleDateFormat("d MMM yyyy");
-                        String formatted = myDate.format(date);
-                        holder.mCreatedDate.setText("Created on " + formatted);
-
-                        holder.itemView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                takeToGroupChatActivity(model.getId());
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-            }
-
-            @NonNull
-            @Override
-            public GroupsFragment.GroupsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                View view = LayoutInflater.from(viewGroup.getContext())
-                        .inflate(R.layout.cardview_group_row, viewGroup, false);
-
-                return new GroupsFragment.GroupsViewHolder(view);
-            }
-
-            @Override
-            public void onViewAttachedToWindow(@NonNull GroupsViewHolder holder) {
-                super.onViewAttachedToWindow(holder);
-                mProgressBar.setVisibility(ProgressBar.GONE);
-            }
-        };
     }
 
     private void takeToGroupChatActivity(String id) {
@@ -225,8 +125,6 @@ public class GroupsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        addFirebaseRecyclerAdapter();
-        mGroupListRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
         mFirebaseRecyclerAdapter.startListening();
     }
 
@@ -265,20 +163,5 @@ public class GroupsFragment extends Fragment {
         startActivity(addGroupIntent);
     }
 
-    public class GroupsViewHolder extends RecyclerView.ViewHolder{
 
-        ImageView mGroupPhoto;
-        TextView mGroupName;
-        TextView mCreatedDate;
-        TextView mMembersInfo;
-
-        public GroupsViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            mGroupPhoto = itemView.findViewById(R.id.group_row_group_photo);
-            mGroupName = itemView.findViewById(R.id.group_row_group_name);
-            mCreatedDate = itemView.findViewById(R.id.group_row_created_date);
-            mMembersInfo = itemView.findViewById(R.id.group_row_member_info);
-        }
-    }
 }

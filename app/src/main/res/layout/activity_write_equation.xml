@@ -25,6 +25,29 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/suggestion_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/latexButtonScrollView"
+        app:layout_constraintTop_toBottomOf="@id/et_typed_equation"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        ></android.support.v7.widget.RecyclerView>
+
+    <ImageView
+        android:id="@+id/showSuggestionImgView"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:onClick="onSuggestionClicked"
+        app:layout_constraintBottom_toBottomOf="@id/et_typed_equation"
+        app:layout_constraintRight_toRightOf="@id/et_typed_equation"
+        app:srcCompat="@drawable/ic_bulb" />
+
     <io.github.kexanie.library.MathView
         android:id="@+id/math_preview_pane"
         android:layout_width="match_parent"
@@ -37,46 +60,48 @@
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/latexButtonScrollView"
 
-        app:layout_constraintTop_toBottomOf="@id/et_typed_equation"
+        android:layout_marginBottom="72dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
+
         <GridLayout
             android:id="@+id/help_buttons_grid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:columnCount="9"
-            android:rowCount="4"
             android:elevation="0dp"
-            android:paddingEnd="5dp"
             android:paddingStart="5dp"
-            android:visibility="visible"
-            android:layout_marginTop="16dp">
+            android:paddingEnd="5dp"
+            android:rowCount="4"
+            android:visibility="visible">
 
             <Button
                 android:id="@+id/latex_underscore"
                 android:layout_width="@dimen/latex_button_width"
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_subscript"
-                android:tag="_"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="_" />
 
             <Button
                 android:id="@+id/latex_square_brackets"
                 android:layout_width="@dimen/latex_button_width"
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_square_brackets"
-                android:tag="\\left[  \\right]"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\left[  \\right]" />
 
             <Button
                 android:id="@+id/latex_curly_braces"
                 android:layout_width="@dimen/latex_button_width"
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_curly_brackets"
-                android:tag="{ }"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="{ }" />
 
             <Button
                 android:id="@+id/latex_parentheses"
@@ -84,8 +109,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_parenthesis"
                 android:elevation="1dp"
-                android:tag="\\left(  \\right)"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\left(  \\right)" />
 
             <Button
                 android:id="@+id/latex_power"
@@ -93,8 +118,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_superscript"
                 android:elevation="1dp"
-                android:tag="^"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="^" />
 
             <Button
                 android:id="@+id/latex_squareRoot"
@@ -102,8 +127,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_root"
                 android:elevation="1dp"
-                android:tag="\\sqrt[ ]{ }"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\sqrt[ ]{ }" />
 
             <Button
                 android:id="@+id/latex_integral"
@@ -120,8 +145,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_absolute"
                 android:elevation="1dp"
-                android:tag="\\left(  \\right)"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\left(  \\right)" />
 
             <Button
                 android:id="@+id/latex_complement"
@@ -129,8 +154,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_complement_bar"
                 android:elevation="1dp"
-                android:tag="\\bar{ }"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\bar{ }" />
 
             <Button
                 android:id="@+id/latex_fraction"
@@ -138,8 +163,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_fraction"
                 android:elevation="1dp"
-                android:tag="\\frac{ }{ } "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\frac{ }{ } " />
 
             <Button
                 android:id="@+id/latex_greaterThanOrEqualsTo"
@@ -147,8 +172,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_greater_than_or_equals_to"
                 android:elevation="1dp"
-                android:tag="\\geq "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\geq " />
 
             <Button
                 android:id="@+id/latex_lessThanOrEqualsTo"
@@ -156,8 +181,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_less_than_or_equals_to"
                 android:elevation="1dp"
-                android:tag="\\leq "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\leq " />
 
             <Button
                 android:id="@+id/latex_infinity"
@@ -165,8 +190,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_infinity"
                 android:elevation="1dp"
-                android:tag="\\infty "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\infty " />
 
             <Button
                 android:id="@+id/latex_intersection"
@@ -174,8 +199,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_intersection"
                 android:elevation="1dp"
-                android:tag="\\bigcap "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\bigcap " />
 
             <Button
                 android:id="@+id/latex_union"
@@ -183,8 +208,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_union"
                 android:elevation="1dp"
-                android:tag="\\bigcup "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\bigcup " />
 
             <Button
                 android:id="@+id/latex_limit"
@@ -192,8 +217,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_limit"
                 android:elevation="1dp"
-                android:tag="\\lim_{{x} \\rightarrow {a}} "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\lim_{{x} \\rightarrow {a}} " />
 
             <Button
                 android:id="@+id/latex_not_equal"
@@ -201,8 +226,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_not_equal"
                 android:elevation="1dp"
-                android:tag="\\neq "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\neq " />
 
             <Button
                 android:id="@+id/latex_partialDerivatives"
@@ -210,8 +235,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_partial_derivative"
                 android:elevation="1dp"
-                android:tag="\\frac{\\partial^{ } }{\\partial { }^{ }} "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\frac{\\partial^{ } }{\\partial { }^{ }} " />
 
             <Button
                 android:id="@+id/latex_plusOrMinus"
@@ -219,8 +244,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_plus_or_minus"
                 android:elevation="1dp"
-                android:tag="\\pm "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\pm " />
 
             <Button
                 android:id="@+id/latex_doubleArrow"
@@ -228,8 +253,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_rightarrow_double"
                 android:elevation="1dp"
-                android:tag="\\Rightarrow "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\Rightarrow " />
 
             <Button
                 android:id="@+id/latex_singleArrow"
@@ -237,8 +262,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_rightarrow_single"
                 android:elevation="1dp"
-                android:tag="\\rightarrow "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\rightarrow " />
 
             <Button
                 android:id="@+id/latex_summation"
@@ -246,8 +271,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_summation"
                 android:elevation="1dp"
-                android:tag="\\sum_{x = a}^{b} "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\sum_{x = a}^{b} " />
 
             <Button
                 android:id="@+id/latex_triangleDown"
@@ -255,8 +280,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_triangle_down"
                 android:elevation="1dp"
-                android:tag="\\bigtriangledown "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\bigtriangledown " />
 
             <Button
                 android:id="@+id/latex_triangleUp"
@@ -264,8 +289,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_triangle_up"
                 android:elevation="1dp"
-                android:tag="\\bigtriangleup "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\bigtriangleup " />
 
             <Button
                 android:id="@+id/latex_vector"
@@ -273,8 +298,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_vector"
                 android:elevation="1dp"
-                android:tag="\\vec{ } "
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag="\\vec{ } " />
 
             <Button
                 android:id="@+id/latex_back_slash"
@@ -282,8 +307,8 @@
                 android:layout_height="@dimen/latex_button_height"
                 android:background="@drawable/math_backslash"
                 android:elevation="1dp"
-                android:tag=" \\"
-                android:onClick="onLatexButtonClicked"/>
+                android:onClick="onLatexButtonClicked"
+                android:tag=" \\" />
 
             <Button
                 android:id="@+id/latex_clear"
@@ -307,7 +332,6 @@
         app:fabSize="normal"
         android:src="@drawable/ic_menu_send"
         />
-
 
 
 </android.support.constraint.ConstraintLayout>

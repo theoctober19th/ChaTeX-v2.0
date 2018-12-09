@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -46,6 +47,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.thecoffeecoders.chatex.ChatexChatApplication;
 import com.thecoffeecoders.chatex.MainActivity;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.users.EditProfileActivity;
@@ -260,6 +262,9 @@ public class LoginActivity extends AppCompatActivity {
 
         if(currentUser != null){
 
+            //write device_token to the database
+            writeDeviceTokenToDatabase();
+
             //Check if user already exists (means it is not the first time the user is logging in)
             DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users/"+currentUser.getUid());
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -292,6 +297,29 @@ public class LoginActivity extends AppCompatActivity {
             });
 
 
+        }
+    }
+
+    private void writeDeviceTokenToDatabase() {
+        SharedPreferences sharedPreferences = getSharedPreferences(ChatexChatApplication.SHARED_PREFERENCE_NAME, MODE_PRIVATE);
+        String device_token = sharedPreferences.getString("device_token", "");
+        boolean isUpdatedDeviceToken = sharedPreferences.getBoolean("device_token_updated", true);
+        if(!isUpdatedDeviceToken){
+            final DatabaseReference tokenIDRef =
+                    FirebaseDatabase
+                            .getInstance()
+                            .getReference()
+                            .child("users")
+                            .child(FirebaseAuth.getInstance().getUid())
+                            .child("deviceToken");
+            tokenIDRef.setValue(device_token).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Log.e("firebase_log", "Device token updated for user " + FirebaseAuth.getInstance().getUid());
+                    }
+                }
+            });
         }
     }
 

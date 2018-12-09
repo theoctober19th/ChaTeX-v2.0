@@ -6,4 +6,79 @@
     android:layout_height="match_parent"
     tools:context=".chat.GroupChatActivity">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/groupChatMessageRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/groupchat_input_layout"
+        app:layout_constraintTop_toTopOf="parent"></android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+
+        android:id="@+id/groupchat_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/groupchatfabAddChatExtension"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="showPopup"
+            android:src="@drawable/ic_plus_white"
+            app:fabSize="mini" />
+
+        <EditText
+            android:id="@+id/et_chatmessage_groupchat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/rounded_edittext"
+            android:fontFamily="@font/nunito_light"
+            android:hint="Type a message.."
+            android:maxLines="4"
+            android:padding="8dp"
+            android:textSize="16sp"
+            android:minLines="2"
+            android:layout_weight="1"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabSendMessage_groupchat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_menu_send"/>
+
+
+    </LinearLayout>
+
+
+    <ProgressBar
+        android:id="@+id/groupchat_activity_progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="74dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

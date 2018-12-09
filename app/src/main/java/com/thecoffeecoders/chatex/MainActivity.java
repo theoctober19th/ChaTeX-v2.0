@@ -1,6 +1,7 @@
 package com.thecoffeecoders.chatex;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -30,6 +33,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,6 +48,7 @@ import com.thecoffeecoders.chatex.fragments.FindFriendsFragment;
 import com.thecoffeecoders.chatex.fragments.FriendsFragment;
 import com.thecoffeecoders.chatex.fragments.GroupsFragment;
 import com.thecoffeecoders.chatex.fragments.RequestsFragment;
+import com.thecoffeecoders.chatex.misc.Constants;
 import com.thecoffeecoders.chatex.models.User;
 import com.thecoffeecoders.chatex.users.EditProfileActivity;
 
@@ -59,10 +65,6 @@ public class MainActivity extends AppCompatActivity
     private FirebaseUser mUser;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
-//    private Uri profilePictureURI;
-//    private Uri coverPictureURI;
-//    private String displayName;
-//    private String username;
     private User localUser;
 
     //Layout elements
@@ -72,54 +74,36 @@ public class MainActivity extends AppCompatActivity
     private ImageView coverPictureImageView;
     private ProgressBar mProgressBar;
 
+    private TextView chatCountTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
 
-
-        //Fireabase objects
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-
-        //localUser = new User();
+        initializeFirebase();
 
         //check whether the user is signed in or not
         checkUserSignedIn();
 
-        //create a Auth State Listener
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if(firebaseAuth.getCurrentUser() == null){
-                    promptForLogin();
-                }
-            }
-        };
-
+        //Setting up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Setting up DrawerLayout
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Layout Elements instantiation
-        usernameTextView = navigationView.getHeaderView(0).findViewById(R.id.main_usernameTextView);
-        displayNameTextView = navigationView.getHeaderView(0).findViewById(R.id.main_displayNameTextview);
-        coverPictureImageView = navigationView.getHeaderView(0).findViewById(R.id.main_coverPictureImageView);
-        profilePictureImageView = navigationView.getHeaderView(0).findViewById(R.id.main_profilePictureImgView);
-        mProgressBar = navigationView.getHeaderView(0).findViewById(R.id.nav_bar_progress_bar);
-        mProgressBar.setVisibility(ProgressBar.VISIBLE);
+        initializeViews(navigationView);
+
         if(mUser != null){
             new DownloadUserDataAndUpdateUITask().execute();
-            //updateHeaderWithInfo();
         }
 
         profilePictureImageView.setOnClickListener(new View.OnClickListener() {
@@ -131,11 +115,35 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        setUpNotificationBadgeCount(navigationView.getMenu());
+
+        //Set ChatFragment as default Fragment
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.navdrawer_screen_area, new ChatFragment());
         fragmentTransaction.commit();
     }
 
+    private void initializeFirebase(){
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if(firebaseAuth.getCurrentUser() == null){
+                    promptForLogin();
+                }
+            }
+        };
+    }
+
+    private void initializeViews(NavigationView navigationView){
+        usernameTextView = navigationView.getHeaderView(0).findViewById(R.id.main_usernameTextView);
+        displayNameTextView = navigationView.getHeaderView(0).findViewById(R.id.main_displayNameTextview);
+        coverPictureImageView = navigationView.getHeaderView(0).findViewById(R.id.main_coverPictureImageView);
+        profilePictureImageView = navigationView.getHeaderView(0).findViewById(R.id.main_profilePictureImgView);
+        mProgressBar = navigationView.getHeaderView(0).findViewById(R.id.nav_bar_progress_bar);
+        mProgressBar.setVisibility(ProgressBar.VISIBLE);
+    }
     private void checkUserSignedIn() {
         if(mUser != null){
             return;
@@ -150,6 +158,17 @@ public class MainActivity extends AppCompatActivity
         loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         finish();
         startActivity(loginIntent);
+    }
+
+    public void setUpNotificationBadgeCount(Menu menu){
+        chatCountTextView = (TextView)menu.findItem(R.id.nav_chats).getActionView();
+        chatCountTextView.setGravity(Gravity.CENTER_VERTICAL);
+        chatCountTextView.setTypeface(null, Typeface.BOLD);
+        chatCountTextView.setTextColor(getResources().getColor(R.color.colorAccent));
+        if(Constants.CHATS_COUNT > 0){
+            chatCountTextView.setText(String.valueOf(Constants.CHATS_COUNT));
+        }
+
     }
 
     @Override
@@ -186,8 +205,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void signOutUser() {
-        LoginManager.getInstance().logOut();
-        FirebaseAuth.getInstance().signOut();
+        DatabaseReference deviceTokenRef = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child("users")
+                .child(mAuth.getUid())
+                .child("deviceToken");
+        deviceTokenRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    LoginManager.getInstance().logOut();
+                    FirebaseAuth.getInstance().signOut();
+                }
+            }
+        });
+
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -229,7 +262,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(Uri uri) {
-
     }
 
     @Override
@@ -267,7 +299,7 @@ public class MainActivity extends AppCompatActivity
                                     RequestOptions requestOptions = new RequestOptions()
                                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                                             .placeholder(R.drawable.img_profile_picture_placeholder_female);
-                                    Glide.with(MainActivity.this)
+                                    Glide.with(getApplicationContext())
                                             .applyDefaultRequestOptions(requestOptions)
                                             .load(localUser.getProfilePicURI())
                                             .into(profilePictureImageView);
@@ -277,7 +309,7 @@ public class MainActivity extends AppCompatActivity
                                     RequestOptions requestOptions = new RequestOptions()
                                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                                             .placeholder(R.drawable.img_cover_photo_placeholder);
-                                    Glide.with(MainActivity.this)
+                                    Glide.with(getApplicationContext())
                                             .applyDefaultRequestOptions(requestOptions)
                                             .load(localUser.getCoverPictureURI())
                                             .into(coverPictureImageView);

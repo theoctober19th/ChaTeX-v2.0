@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class User {
+    private String deviceToken;
     private String id;
     private String username;
     private String displayName;
@@ -48,6 +49,15 @@ public class User {
         coverPictureURI = "";
         lastOnline = 0;
         onlineStatus = false;
+        deviceToken = "";
+    }
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
     }
 
     public String getGender() {

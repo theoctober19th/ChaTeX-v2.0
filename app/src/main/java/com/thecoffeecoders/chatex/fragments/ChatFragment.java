@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,14 +23,6 @@ import com.thecoffeecoders.chatex.adapters.ChatRecyclerAdapter;
 import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Friend;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ChatFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ChatFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ChatFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -83,6 +76,7 @@ public class ChatFragment extends Fragment {
                 .getReference()
                 .child("chat").child(mUserID)
                 .orderByChild("seenTimestamp");
+        mMessagesRef.keepSynced(true);
     }
 
     public void initializeViews(View parentView){
@@ -96,6 +90,9 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_chat, container, false);
+
+        //Set ActionBar title
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Chats");
 
         instantiateFirebaseObjects();
         initializeViews(view);
