@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".chat.ChatActivity">
 
+    <include layout="@layout/chat_toolbar_layout"
+        android:id="@+id/chat_appbar"></include>
+
     <com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView
         android:id="@+id/chatMessageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/chat_input_layout"
-        app:layout_constraintTop_toTopOf="parent"></com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView>
+        app:layout_constraintTop_toBottomOf="@id/chat_appbar"></com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/activity_chat_empty_view"
@@ -21,7 +24,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/chat_appbar">
 
         <TextView
             android:id="@+id/textView1"

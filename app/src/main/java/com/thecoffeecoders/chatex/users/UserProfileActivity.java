@@ -49,6 +49,16 @@ public class UserProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
+        initializeViews();
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mExtras = getIntent().getExtras();
+
+        new FetchUserDetailsAndDisplayUITask().execute();
+
+    }
+
+    private void initializeViews() {
         //Layout files instantiation
         mUserProfileCoverPhotoImageView = findViewById(R.id.user_profile_header_cover_image);
         mUserProfileProfilePictureImageView = findViewById(R.id.user_profile_photo);
@@ -58,12 +68,6 @@ public class UserProfileActivity extends AppCompatActivity {
         mUserProfileAddressTextView = findViewById(R.id.user_profile_address);
         mUserProfileMemberSinceTextView = findViewById(R.id.user_profile_member_since);
         mUserProfileFab = findViewById(R.id.user_profile_fab);
-
-
-        mExtras = getIntent().getExtras();
-
-        new FetchUserDetailsAndDisplayUITask().execute();
-
     }
 
     private class FetchUserDetailsAndDisplayUITask extends AsyncTask<Void, Void, Void>{
@@ -120,7 +124,7 @@ public class UserProfileActivity extends AppCompatActivity {
         mUserProfileDisplayNameTextView.setText(user.getDisplayName());
         mUserProfileUserNameTextView.setText("@" + user.getUsername());
         mUserProfileBioTextView.setText(user.getBio());
-        mUserProfileAddressTextView.setText(user.getAddress());
+        mUserProfileAddressTextView.setText("From: " + user.getAddress());
         //mUserProfileMemberSinceTextView.setText(user.getMemberSince());
     }
 }

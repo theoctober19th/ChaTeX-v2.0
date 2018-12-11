@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: io.github.kexanie.library:MathView-0.0.6">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/MathView-0.0.6.aar/931d276be961d9f391b95260dab733ef/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/MathView-0.0.6.aar/931d276be961d9f391b95260dab733ef/jars/libs/chunk-templates-3.0.1.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/MathView-0.0.6.aar/931d276be961d9f391b95260dab733ef/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.github.kexanie.library/MathView/0.0.6/826dc8ece4b9c724ff3ae7509188e44ea94d8435/MathView-0.0.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

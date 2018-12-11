@@ -67,8 +67,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".users.EditProfileActivity" />
-        <activity android:name=".users.UserProfileActivity" />
-        <activity android:name=".chat.ChatActivity" />
+        <activity android:name=".users.UserProfileActivity"
+            android:theme="@style/ChatexNoAppBarTheme"/>
+        <activity android:name=".chat.ChatActivity"
+            android:theme="@style/ChatexNoAppBarTheme"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".AddGroupActivity" />
         <activity android:name=".chat.GroupChatActivity" />
         <activity

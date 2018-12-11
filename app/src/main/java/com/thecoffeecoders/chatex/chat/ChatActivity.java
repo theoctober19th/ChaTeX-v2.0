@@ -18,8 +18,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,6 +37,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.adapters.MessageRecyclerAdapter;
 import com.thecoffeecoders.chatex.math.WriteEquationActivity;
@@ -38,6 +45,7 @@ import com.thecoffeecoders.chatex.misc.SendLocation;
 import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Message;
 import com.thecoffeecoders.chatex.models.Request;
+import com.thecoffeecoders.chatex.models.User;
 import com.thecoffeecoders.chatex.users.UserProfileActivity;
 import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
 //import com.thecoffeecoders.chatex.utils.Utils;
@@ -59,6 +67,7 @@ public class ChatActivity extends AppCompatActivity {
     private FloatingActionButton mChatExtensionBtn;
     private LinearLayout mChatInputLayout;
     private LinearLayout mRequestOptionsLayout;
+    android.support.v7.widget.Toolbar mToolbar;
 
     private MessageRecyclerAdapter mMessageAdapter;
 
@@ -68,6 +77,9 @@ public class ChatActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     String currentUserID;
+    String otherUserProfilePicURI;
+    long otherUserLastOnline;
+    String otherUserDisplayName;
     String otherUserID;
 
     private static String POPUP_CONSTANT = "mPopup";
@@ -82,6 +94,7 @@ public class ChatActivity extends AppCompatActivity {
         initializeViews();
         initializeFirebaseObjects();
 
+
         mSendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,8 +105,52 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        checkIfFriends();
+        //checkIfFriends();
+        setToolbar();
         addAdapter();
+    }
+
+    private void setToolbar() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("HEHE");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        DatabaseReference otherUserRef = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child("users")
+                .child(otherUserID);
+        otherUserRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    User otherUser = dataSnapshot.getValue(User.class);
+                    otherUserProfilePicURI = otherUser.getProfilePicURI();
+                    otherUserDisplayName = otherUser.getDisplayName();
+                    otherUserLastOnline = otherUser.getLastOnline();
+                    //otherUserProfilePicURI = dataSnapshot.getValue().toString();
+
+                    CircularImageView appbarImage = findViewById(R.id.chat_appbar_image);
+                    Glide.with(ChatActivity.this)
+                            .applyDefaultRequestOptions(new RequestOptions()
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL))
+                            .load(otherUserProfilePicURI)
+                            .into(appbarImage);
+                    TextView appBarDisplayName = findViewById(R.id.chat_appbar_name);
+                    appBarDisplayName.setText(otherUserDisplayName);
+                    TextView appBarLastOnline = findViewById(R.id.chat_appbar_lastOnline);
+                    appBarLastOnline.setText("TODO : Last online");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getOtherUserData() {
     }
 
     public void checkIfFriends(){
@@ -137,7 +194,7 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseRecyclerOptions<Message> options = new FirebaseRecyclerOptions.Builder<Message>()
                 .setQuery(msgRef, Message.class)
                 .build();
-        mMessageAdapter = new MessageRecyclerAdapter(options);
+        mMessageAdapter = new MessageRecyclerAdapter(options, currentUserID, otherUserID/*, otherUserProfilePicURI*/);
         mChatRecyclerView.setAdapter(mMessageAdapter);
     }
 
@@ -166,6 +223,7 @@ public class ChatActivity extends AppCompatActivity {
         mProgressBar = findViewById(R.id.chat_activity_progress_bar);
         mProgressBar.setVisibility(ProgressBar.VISIBLE);
         mChatInputLayout = findViewById(R.id.chat_input_layout);
+        mToolbar = findViewById(R.id.chat_appbar);
         //mRequestOptionsLayout = findViewById(R.id.request_options_layout);
 
         //mChatInputLayout.setVisibility(View.VISIBLE);

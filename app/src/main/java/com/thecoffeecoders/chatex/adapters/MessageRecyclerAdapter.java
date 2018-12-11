@@ -41,8 +41,31 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
     final int VIEW_TYPE_SENDER = 1;
     final int VIEW_TYPE_RECEIVER = 2;
 
-    public MessageRecyclerAdapter(@NonNull FirebaseRecyclerOptions options) {
+    String thisUserID;
+    String otherUserID;
+    String otherUserProfilePicURI;
+
+    public MessageRecyclerAdapter(@NonNull FirebaseRecyclerOptions options, String thisUserID, String otherUserID/*, String otherUserProfilePicURI*/) {
         super(options);
+        this.thisUserID =thisUserID;
+        this.otherUserID = otherUserID;
+
+        DatabaseReference userRef = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child("users").child(otherUserID).child("profilePicURI");
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    otherUserProfilePicURI = dataSnapshot.getValue().toString();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     @Override
@@ -56,31 +79,54 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position, @NonNull final Message message) {
+    protected void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position, @NonNull final Message message) {
 
         String senderUID = message.getSender();
         switch (holder.getItemViewType()){
             case VIEW_TYPE_SENDER:
-                ((SentMessageHolder)holder).bind(message);
+                boolean adjascency = false;
+                if(position > 0){
+                    if(getItemViewType(position-1) == VIEW_TYPE_SENDER){
+                        adjascency = true;
+                    }
+                }
+                ((SentMessageHolder)holder).bind(message, adjascency);
                 break;
             case VIEW_TYPE_RECEIVER:
-                DatabaseReference userRef = FirebaseDatabase
-                        .getInstance()
-                        .getReference()
-                        .child("users").child(senderUID).child("profilePicURI");
-                userRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()){
-                            String profilePicURI = dataSnapshot.getValue().toString();
-                            ((ReceivedMessageHolder)holder).bind(message, profilePicURI);
+                if(otherUserProfilePicURI == null){
+                    DatabaseReference userRef = FirebaseDatabase
+                            .getInstance()
+                            .getReference()
+                            .child("users").child(senderUID).child("profilePicURI");
+                    userRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()){
+                                String profilePicURI = dataSnapshot.getValue().toString();
+                                otherUserProfilePicURI = profilePicURI;
+                                boolean adjascency = false;
+                                if(position > 0){
+                                    if(getItemViewType(position-1) == VIEW_TYPE_RECEIVER){
+                                        adjascency = true;
+                                    }
+                                }
+                                ((ReceivedMessageHolder)holder).bind(message, profilePicURI, adjascency);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
+                    });
+                }else{
+                    boolean isAdjascent = false;
+                    if(position > 0){
+                        if(getItemViewType(position-1) == VIEW_TYPE_RECEIVER){
+                            isAdjascent = true;
                         }
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
+                    ((ReceivedMessageHolder)holder).bind(message, otherUserProfilePicURI, isAdjascent);
+                }
                 break;
         }
     }
@@ -126,7 +172,7 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
             mathView = mView.findViewById(R.id.mathmessage_other);
         }
 
-        private void bind(Message message, String profilePicURI){
+        private void bind(Message message, String profilePicURI, boolean adjascency){
             context = mView.getContext();
 
             String messageType = message.getType();
@@ -162,12 +208,14 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
 
             }
 
-            RequestOptions requestOptions = new RequestOptions()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL);
-            Glide.with(context)
-                    .applyDefaultRequestOptions(requestOptions)
-                    .load(profilePicURI)
-                    .into(profileImageThumb);
+            if(!adjascency){
+                RequestOptions requestOptions = new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL);
+                Glide.with(context)
+                        .applyDefaultRequestOptions(requestOptions)
+                        .load(profilePicURI)
+                        .into(profileImageThumb);
+            }
             String recievedTime = Utils.convertTimestampToDate(message.getTimestamp());
             receivedTime.setText(recievedTime);
         }
@@ -199,7 +247,7 @@ public class MessageRecyclerAdapter extends FirebaseRecyclerAdapter<Message, Rec
             mathContainer = itemView.findViewById(R.id.mathview_container_this);
         }
 
-        private void bind(Message message){
+        private void bind(Message message, boolean adjascency){
             if(message.getType().equals("text")){
                 textMessage.setText(message.getContent());
                 textMessage.setVisibility(View.VISIBLE);
