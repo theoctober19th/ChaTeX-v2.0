@@ -24,7 +24,6 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,7 +32,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.chat.ChatActivity;
-import com.thecoffeecoders.chatex.chat.GroupChatActivity;
 import com.thecoffeecoders.chatex.misc.Constants;
 import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Group;
@@ -128,9 +126,10 @@ public class ChatRecyclerAdapter extends FirebaseRecyclerAdapter<Chat, RecyclerV
                                             ((ChatViewHolder) holder).view.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
-                                                    Intent groupChatIntent = new Intent(v.getContext(), GroupChatActivity.class);
-                                                    groupChatIntent.putExtra("groupid", groupid);
-                                                    mContext.startActivity(groupChatIntent);
+//                                                    Intent groupChatIntent = new Intent(v.getContext(), GroupChatActivity.class);
+//                                                    groupChatIntent.putExtra("groupid", groupid);
+//                                                    mContext.startActivity(groupChatIntent);
+
                                                     //take user to UserProfileActivity
 //                                                    Intent chatIntent = new Intent(v.getContext(), ChatActivity.class);
 //                                                    chatIntent.putExtra("uid", uid);

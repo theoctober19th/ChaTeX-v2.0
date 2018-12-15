@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -299,6 +300,12 @@ public class RegisterActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+
+                            SharedPreferences.Editor editor = getSharedPreferences("com.thecoffeecoders.chatex", MODE_PRIVATE).edit();
+                            editor.putBoolean("email_verified", user.isEmailVerified());
+                            editor.apply();
+                            updateUI(user);
+
                             updateUI(user);
                         } else {
                             stopLoadingAnimation();

@@ -30,9 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.chat.GroupChatActivity;
-import com.thecoffeecoders.chatex.fragments.GroupsFragment;
 import com.thecoffeecoders.chatex.models.Group;
-import com.thecoffeecoders.chatex.users.UserProfileActivity;
 import com.thecoffeecoders.chatex.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -88,7 +86,7 @@ public class GroupRecyclerAdapter extends FirebaseRecyclerAdapter<Boolean, Group
         ImageView mGroupPhoto;
         TextView mGroupName;
         TextView mCreatedDate;
-        TextView mMembersInfo;
+        //TextView mMembersInfo;
         Context mContext;
         View mView;
 
@@ -99,7 +97,7 @@ public class GroupRecyclerAdapter extends FirebaseRecyclerAdapter<Boolean, Group
             mGroupPhoto = itemView.findViewById(R.id.group_row_group_photo);
             mGroupName = itemView.findViewById(R.id.group_row_group_name);
             mCreatedDate = itemView.findViewById(R.id.group_row_created_date);
-            mMembersInfo = itemView.findViewById(R.id.group_row_member_info);
+            //mMembersInfo = itemView.findViewById(R.id.group_row_member_info);
             mContext = itemView.getContext();
         }
 
@@ -120,7 +118,8 @@ public class GroupRecyclerAdapter extends FirebaseRecyclerAdapter<Boolean, Group
             if(model.getName() != null){
                 mGroupName.setText(model.getName());
             }
-            mMembersInfo.setText(model.getMemberCount() + " members");
+
+            //mMembersInfo.setText(model.getMemberCount() + " members");
 
             Date date = new Date(Long.valueOf(model.getCreated()));
             SimpleDateFormat myDate = new SimpleDateFormat("dd MMM yyyy");

@@ -4,47 +4,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.thecoffeecoders.chatex.AddGroupActivity;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.adapters.GroupRecyclerAdapter;
-import com.thecoffeecoders.chatex.chat.ChatActivity;
 import com.thecoffeecoders.chatex.chat.GroupChatActivity;
-import com.thecoffeecoders.chatex.models.Friend;
-import com.thecoffeecoders.chatex.models.Group;
-import com.thecoffeecoders.chatex.utils.Utils;
 import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class GroupsFragment extends Fragment {

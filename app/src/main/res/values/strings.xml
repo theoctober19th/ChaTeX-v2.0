@@ -33,4 +33,6 @@
         <item>Other</item>
     </string-array>
     <string name="title_send_location_activity">Send Location</string>
+    <string name="title_activity_new_group">NewGroupActivity</string>
+    <string name="title_activity_group_chat">GroupChatActivity</string>
 </resources>

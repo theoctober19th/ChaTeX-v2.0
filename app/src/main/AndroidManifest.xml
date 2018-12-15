@@ -76,9 +76,6 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/ChatexNoAppBarTheme" />
         <activity android:name=".AddGroupActivity" />
-        <activity android:name=".chat.GroupChatActivity"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/ChatexNoAppBarTheme"/>
         <activity
             android:name=".auth.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -130,7 +127,13 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
 
-        <activity android:name=".ViewEquation"></activity>
+        <activity android:name=".misc.ViewEquation" />
+        <activity
+            android:name=".chat.GroupChatActivity"
+            android:label="@string/title_activity_group_chat"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".auth.VerifyEmailActivity"></activity>
     </application>
 
 </manifest>

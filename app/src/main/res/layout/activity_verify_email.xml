@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".auth.VerifyEmailActivity">
+
+    <ImageView
+        android:id="@+id/verify_email_app_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/chatex_app_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="8dp"/>
+
+    <TextView
+        android:id="@+id/textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your email address is not verified."
+        android:gravity="center_horizontal"
+        android:textSize="18sp"
+        android:fontFamily="@font/nunito_light"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:layout_margin="8dp"
+        app:layout_constraintTop_toBottomOf="@id/verify_email_app_icon"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <TextView
+        android:id="@+id/textview2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="You can tap on the 'Send Verification Link' Button to send verification link to your email address.\n\nOnce you have verified your email, tap on the login button to login to your account."
+        android:gravity="center_horizontal"
+        android:textSize="16sp"
+        android:fontFamily="@font/nunito_light"
+        android:padding="8dp"
+        android:layout_margin="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/textview"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <Button
+        android:id="@+id/verify_email_send_link_button"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+        android:text="Send Verification Link"
+        app:layout_constraintTop_toBottomOf="@id/textview2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="8dp"/>
+
+    <Button
+        android:id="@+id/verify_email_login_button"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+        android:text="Login"
+        app:layout_constraintTop_toBottomOf="@id/verify_email_send_link_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="8dp"/>
+
+</android.support.constraint.ConstraintLayout>

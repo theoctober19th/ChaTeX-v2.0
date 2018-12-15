@@ -69,7 +69,7 @@ public class SendLocation extends FragmentActivity implements OnMapReadyCallback
         mLocationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
         initializeViews();
-        if(getIntent().getExtras() == null){
+        if(getIntent().getStringExtra("location") == null){
             setLocationListener();
         }else{
             mSendLocationBtn.hide();

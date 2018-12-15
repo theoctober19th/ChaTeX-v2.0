@@ -2,17 +2,13 @@ package com.thecoffeecoders.chatex.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -23,23 +19,17 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
-import com.thecoffeecoders.chatex.ChatexChatApplication;
 import com.thecoffeecoders.chatex.R;
-import com.thecoffeecoders.chatex.ViewEquation;
+import com.thecoffeecoders.chatex.misc.ViewEquation;
 import com.thecoffeecoders.chatex.misc.SendLocation;
 import com.thecoffeecoders.chatex.models.Message;
 import com.thecoffeecoders.chatex.utils.Utils;
-
-import java.io.IOException;
-
-import katex.hourglass.in.mathlib.MathView;
 
 //import io.github.kexanie.library.MathView;
 

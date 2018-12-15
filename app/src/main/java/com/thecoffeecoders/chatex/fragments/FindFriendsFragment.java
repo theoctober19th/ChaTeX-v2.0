@@ -9,9 +9,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -23,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.models.User;
@@ -56,6 +60,8 @@ public class FindFriendsFragment extends Fragment {
     private View mMainView;
     //RecyclerView
     private RecyclerView mFindFriendRecyclerView;
+
+    private EditText mSearchQueryEditText;
     //Recycler Adapter
     FirebaseRecyclerAdapter findFriendsRecyclerAdapter;
 
@@ -108,8 +114,34 @@ public class FindFriendsFragment extends Fragment {
 
         //RecyclerView instantiation
         mFindFriendRecyclerView = (RecyclerView)mMainView.findViewById(R.id.find_friends_recyclerview);
+        //mFindFriendRecyclerView.setHasFixedSize(true);
+        mSearchQueryEditText = mMainView.findViewById(R.id.search_query_edittext);
        // mFindFriendRecyclerView.setHasFixedSize(true);
         mFindFriendRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        setAdapter(mUsersRef);
+
+        mSearchQueryEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String text = s.toString();
+
+                Query query = mUsersRef
+                        .orderByChild("displayName")
+                        //.equalTo(text);
+                        .startAt(text)
+                        .endAt(text + "\uf8ff");
+                setAdapter(query);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         return mMainView;
     }
@@ -198,13 +230,10 @@ public class FindFriendsFragment extends Fragment {
         }
     }
 
-
-    public void onStart() {
-        super.onStart();
-
+    public void setAdapter(Query query){
         //FirebaseRecyclerAdapter
         FirebaseRecyclerOptions<User> options = new FirebaseRecyclerOptions.Builder<User>()
-                .setQuery(mUsersRef, User.class)
+                .setQuery(query, User.class)
                 .build();
 
         findFriendsRecyclerAdapter = new FirebaseRecyclerAdapter<User, FindFriendsFragment.UsersViewHolder>(options) {
@@ -237,6 +266,11 @@ public class FindFriendsFragment extends Fragment {
             }
         };
         mFindFriendRecyclerView.setAdapter(findFriendsRecyclerAdapter);
+        findFriendsRecyclerAdapter.startListening();
+    }
+
+    public void onStart() {
+        super.onStart();
         findFriendsRecyclerAdapter.startListening();
     }
 

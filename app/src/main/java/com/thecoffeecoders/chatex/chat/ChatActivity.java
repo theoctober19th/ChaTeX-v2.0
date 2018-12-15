@@ -484,7 +484,7 @@ public class ChatActivity extends AppCompatActivity {
                                 .getIntent(ChatActivity.this);
                         startActivityForResult(intent, RC_PICK_IMAGE);
 
-                        Toast.makeText(ChatActivity.this, "TODO: Fetch Image From Gallery", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(ChatActivity.this, "TODO: Fetch Image From Gallery", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }

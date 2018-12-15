@@ -1,4 +1,4 @@
-package com.thecoffeecoders.chatex;
+package com.thecoffeecoders.chatex.misc;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+
+import com.thecoffeecoders.chatex.R;
 
 import io.github.kexanie.library.MathView;
 
@@ -24,6 +26,7 @@ public class ViewEquation extends AppCompatActivity {
         setContentView(R.layout.activity_view_equation);
 
         initializeViews();
+        getSupportActionBar().setTitle("View Equation");
 
         mEquation = getIntent().getStringExtra("equation");
         mMathView.setText("$$" + mEquation + "$$");

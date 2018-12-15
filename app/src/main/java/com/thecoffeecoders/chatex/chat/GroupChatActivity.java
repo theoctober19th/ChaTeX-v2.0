@@ -1,18 +1,28 @@
 package com.thecoffeecoders.chatex.chat;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.MenuItem;
+import android.view.Gravity;
 import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -22,6 +32,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,39 +41,44 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import com.thecoffeecoders.chatex.R;
+import com.thecoffeecoders.chatex.adapters.GroupMemberAdapter;
 import com.thecoffeecoders.chatex.adapters.GroupMessageRecyclerAdapter;
-import com.thecoffeecoders.chatex.adapters.MessageRecyclerAdapter;
+import com.thecoffeecoders.chatex.interfaces.OnAdapterItemClicked;
 import com.thecoffeecoders.chatex.math.WriteEquationActivity;
 import com.thecoffeecoders.chatex.misc.SendLocation;
-import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Group;
 import com.thecoffeecoders.chatex.models.Message;
-import com.thecoffeecoders.chatex.models.Request;
 import com.thecoffeecoders.chatex.models.User;
-import com.thecoffeecoders.chatex.users.UserProfileActivity;
+import com.thecoffeecoders.chatex.views.EndDrawerToggle;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import id.zelory.compressor.Compressor;
+
 public class GroupChatActivity extends AppCompatActivity {
 
+    DrawerLayout mDrawerLayout;
     //Views
     private EditText mTypeMessageEditText;
     private FloatingActionButton mSendImageButton;
     private RecyclerView mChatRecyclerView;
     private ProgressBar mProgressBar;
     private FloatingActionButton mChatExtensionBtn;
-    private LinearLayout mChatInputLayout;
-    private LinearLayout mRequestOptionsLayout;
-    android.support.v7.widget.Toolbar mToolbar;
+    private RecyclerView mGroupMemberRecyclerView;
 
+    private GroupMemberAdapter mGropuMemberAdapter;
     private GroupMessageRecyclerAdapter mMessageAdapter;
-
-    private boolean isFriend = true;
 
     //Firebase Objects
     FirebaseAuth mAuth;
@@ -72,15 +88,30 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private static String POPUP_CONSTANT = "mPopup";
     private static String POPUP_FORCE_SHOW_ICON = "setForceShowIcon";
-    private int RC_LATEX_EQUATION = 001;
+    private final int RC_LATEX_EQUATION = 001;
+    public static final int RC_LOCATION_MSG = 002;
+    public static final int RC_PICK_IMAGE = 003;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.groupchatappbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initializeViews();
         initializeFirebaseObjects();
+        setToolbar();
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.groupchat_drawer_layout);
+        EndDrawerToggle toggle = new EndDrawerToggle(
+                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.groupchat_nav_view);
+        mGroupMemberRecyclerView = navigationView.getHeaderView(0).findViewById(R.id.group_member_recyclerview);
 
         mSendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,69 +123,11 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
         mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        //checkIfFriends();
-        setToolbar();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+        mGroupMemberRecyclerView.setLayoutManager(linearLayoutManager);
         addAdapter();
-    }
 
-//    public void checkIfFriends(){
-//        DatabaseReference friendRef = FirebaseDatabase
-//                .getInstance()
-//                .getReference()
-//                .child("friendlist")
-//                .child(currentUserID)
-//                .child(otherUserID);
-//        friendRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                if(!dataSnapshot.exists()){
-//                    isFriend = false;
-//                    //mChatInputLayout.setVisibility(View.GONE);
-//                    //mRequestOptionsLayout.setVisibility(View.VISIBLE);
-//                }else{
-//                    //isFriend = true;
-//                    //mRequestOptionsLayout.setVisibility(View.GONE);
-//                    //mChatInputLayout.setVisibility(View.VISIBLE);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
-
-    public void addAdapter(){
-//        Query msgquery = FirebaseDatabase
-//                .getInstance()
-//                .getReference()
-//                .child("messages").child(currentUserID).child(groupID)
-//                .orderByChild("timestamp");
-        DatabaseReference msgRef = FirebaseDatabase
-                .getInstance()
-                .getReference()
-                .child("groupmessages").child(groupID);
-        FirebaseRecyclerOptions<Message> options = new FirebaseRecyclerOptions.Builder<Message>()
-                .setQuery(msgRef, Message.class)
-                .build();
-        mMessageAdapter = new GroupMessageRecyclerAdapter(options);
-        mChatRecyclerView.setAdapter(mMessageAdapter);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        mMessageAdapter.startListening();
-        mProgressBar.setVisibility(ProgressBar.GONE);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMessageAdapter.stopListening();
     }
 
     private void initializeViews(){
@@ -163,12 +136,6 @@ public class GroupChatActivity extends AppCompatActivity {
         mChatRecyclerView = findViewById(R.id.groupChatMessageRecyclerView);
         mProgressBar = findViewById(R.id.groupchat_activity_progress_bar);
         mProgressBar.setVisibility(ProgressBar.VISIBLE);
-        mChatInputLayout = findViewById(R.id.groupchat_input_layout);
-        mToolbar = findViewById(R.id.groupchat_appbar);
-        //mRequestOptionsLayout = findViewById(R.id.request_options_layout);
-
-        //mChatInputLayout.setVisibility(View.VISIBLE);
-        //mRequestOptionsLayout.setVisibility(View.VISIBLE);
     }
 
     private void initializeFirebaseObjects(){
@@ -178,6 +145,94 @@ public class GroupChatActivity extends AppCompatActivity {
             groupID = getIntent().getStringExtra("groupid");
         }
         currentUserID = mUser.getUid();
+    }
+
+    public void setToolbar(){
+
+
+        DatabaseReference otherUserRef = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child("groups")
+                .child(groupID);
+        otherUserRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Group group = dataSnapshot.getValue(Group.class);
+                    String groupPicURI = group.getGroupPicURI();
+                    String groupname = group.getName();
+                    int membercount = group.getMemberCount();
+                    //otherUserProfilePicURI = dataSnapshot.getValue().toString();
+
+                    CircularImageView appbarImage = findViewById(R.id.groupchat_appbar_image);
+                    Glide.with(GroupChatActivity.this)
+                            .applyDefaultRequestOptions(new RequestOptions()
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL))
+                            .load(groupPicURI)
+                            .into(appbarImage);
+                    TextView appBarDisplayName = findViewById(R.id.groupchat_appbar_name);
+                    appBarDisplayName.setText(groupname);
+                    TextView appBarLastOnline = findViewById(R.id.groupchat_appbar_membercount);
+//                    appBarLastOnline.setText(String.valueOf(membercount) + " members");
+                    appBarLastOnline.setText("");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void addAdapter(){
+        DatabaseReference msgRef = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child("groupmessages").child(groupID);
+        FirebaseRecyclerOptions<Message> options = new FirebaseRecyclerOptions.Builder<Message>()
+                .setQuery(msgRef, Message.class)
+                .build();
+        mMessageAdapter = new GroupMessageRecyclerAdapter(options);
+
+
+        DatabaseReference groupMemberRef = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child("groupmembers")
+                .child(groupID);
+        FirebaseRecyclerOptions<Boolean> options1 = new FirebaseRecyclerOptions.Builder<Boolean>()
+                .setQuery(groupMemberRef, Boolean.class)
+                .build();
+        mGropuMemberAdapter = new GroupMemberAdapter(options1, groupID);
+    }
+
+
+        @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.END)) {
+            drawer.closeDrawer(GravityCompat.END);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGroupMemberRecyclerView.setAdapter(mGropuMemberAdapter);
+        mGropuMemberAdapter.startListening();
+        mChatRecyclerView.setAdapter(mMessageAdapter);
+        mMessageAdapter.startListening();
+        mProgressBar.setVisibility(ProgressBar.GONE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mMessageAdapter.stopListening();
     }
 
     private void sendMessage(String messageContent, String type) {
@@ -209,14 +264,71 @@ public class GroupChatActivity extends AppCompatActivity {
         clearInput();
     }
 
-    public void openProfile(View view){
-//        Intent profileIntent = new Intent(this, UserProfileActivity.class);
-//        profileIntent.putExtra("uid", otherUserID);
-//        startActivity(profileIntent);
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == RESULT_OK){
+            switch(requestCode){
+                case RC_LATEX_EQUATION:
+                    String latexCode = data.getStringExtra("equation");
+                    sendMessage(latexCode, "math");
+                    break;
+                case RC_LOCATION_MSG:
+                    String locationData = data.getStringExtra("location");
+                    sendMessage(locationData, "location");
+                    break;
+                case RC_PICK_IMAGE:
+                    CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                    Uri pickedImageUri = result.getUri();
+                    /*String imageMsg = */uploadImage(pickedImageUri);
+//                    sendMessage(imageMsg, "image");
+                    break;
+            }
+        }
     }
 
-    public void clearInput(){
-        mTypeMessageEditText.setText("");
+    private void uploadImage(Uri pickedImageUri) {
+        File originalPictureFile = new File(pickedImageUri.getPath());
+        File compressedPictureFile = originalPictureFile;
+        try {
+            compressedPictureFile = new Compressor(this)
+                    .setMaxWidth(300)
+                    .setMaxHeight(300)
+                    .setQuality(75)
+                    .compressToFile(originalPictureFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        FirebaseStorage mStorage = FirebaseStorage.getInstance();
+        String key = FirebaseDatabase.getInstance().getReference().child("keys").push().getKey();
+        final StorageReference imageStorageRef =
+                mStorage.getReference()
+                        .child("user_message_images")
+                        .child(mUser.getUid())
+                        .child(key);
+        UploadTask uploadTask = imageStorageRef.putFile(Uri.fromFile(compressedPictureFile));
+
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return imageStorageRef.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    sendMessage(downloadUri.toString(), "image");
+                    Toast.makeText(GroupChatActivity.this, "MESSAGE SENT", Toast.LENGTH_SHORT).show();
+                } else {
+                    task.getException().printStackTrace();
+                }
+            }
+        });
     }
 
     public void showPopup(View view) {
@@ -249,14 +361,17 @@ public class GroupChatActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()){
                     case R.id.ext_menu_location:
                         Intent sendLocationIntent = new Intent(GroupChatActivity.this, SendLocation.class);
-                        startActivity(sendLocationIntent);
+                        startActivityForResult(sendLocationIntent, RC_LOCATION_MSG);
                         break;
                     case R.id.ext_menu_math:
                         Intent writeEquationIntent = new Intent(GroupChatActivity.this, WriteEquationActivity.class);
                         startActivityForResult(writeEquationIntent, RC_LATEX_EQUATION);
                         break;
                     case R.id.ext_menu_photo:
-                        Toast.makeText(GroupChatActivity.this, "TODO: Fetch Image From Gallery", Toast.LENGTH_SHORT).show();
+                        Intent intent = CropImage.activity()
+                                .setGuidelines(CropImageView.Guidelines.ON)
+                                .getIntent(GroupChatActivity.this);
+                        startActivityForResult(intent, RC_PICK_IMAGE);
                 }
                 return false;
             }
@@ -264,65 +379,61 @@ public class GroupChatActivity extends AppCompatActivity {
         popup.show();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == RC_LATEX_EQUATION){
-            if(resultCode == RESULT_OK){
-                String latexCode = data.getStringExtra("equation");
-                sendMessage(latexCode, "math");
-            }
-        }
+    public void clearInput(){
+        mTypeMessageEditText.setText("");
     }
 
-    private void setToolbar() {
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        DatabaseReference otherUserRef = FirebaseDatabase
-                .getInstance()
-                .getReference()
-                .child("groups")
-                .child(groupID);
-        otherUserRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    Group group = dataSnapshot.getValue(Group.class);
-                    String groupPicURI = group.getGroupPicURI();
-                    String groupName = group.getName();
-                    int memberCount = group.getMemberCount();
 
-                    CircularImageView appbarImage = findViewById(R.id.chat_appbar_image);
-                    Glide.with(GroupChatActivity.this)
-                            .applyDefaultRequestOptions(new RequestOptions()
-                                    .diskCacheStrategy(DiskCacheStrategy.ALL))
-                            .load(groupPicURI)
-                            .into(appbarImage);
-                    TextView appBarDisplayName = findViewById(R.id.chat_appbar_name);
-                    appBarDisplayName.setText(groupName);
-                    TextView appBarLastOnline = findViewById(R.id.chat_appbar_lastOnline);
-                    //appBarLastOnline.setText("TODO : Last online");
-                    appBarLastOnline.setText(String.valueOf(memberCount) + " members");
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+    //    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        //getMenuInflater().inflate(R.menu.group_chat, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
+//
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.nav_camera) {
+//            // Handle the camera action
+//        } else if (id == R.id.nav_gallery) {
+//
+//        } else if (id == R.id.nav_slideshow) {
+//
+//        } else if (id == R.id.nav_manage) {
+//
+//        } else if (id == R.id.nav_share) {
+//
+//        } else if (id == R.id.nav_send) {
+//
+//        }
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
 
-            }
-        });
-    }
-
-    public void fetchImageFromDevice(){
-//        Matisse.from(ChatActivity.this)
-//                .choose(MimeType.allOf())
-//                .countable(true)
-//                .maxSelectable(9)
-//                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-//                .thumbnailScale(0.85f)
-//                .imageEngine(new GlideEngine())
-//                .forResult(REQUEST_CODE_CHOOSE);
+    protected void toggleDrawer(View view){
+        mDrawerLayout.openDrawer(GravityCompat.END);
     }
 }
-

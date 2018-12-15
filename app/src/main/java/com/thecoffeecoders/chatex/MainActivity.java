@@ -1,17 +1,14 @@
 package com.thecoffeecoders.chatex;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -23,7 +20,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -43,6 +39,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thecoffeecoders.chatex.auth.LoginActivity;
+import com.thecoffeecoders.chatex.auth.VerifyEmailActivity;
+import com.thecoffeecoders.chatex.chat.GroupChatActivity;
 import com.thecoffeecoders.chatex.fragments.ChatFragment;
 import com.thecoffeecoders.chatex.fragments.FindFriendsFragment;
 import com.thecoffeecoders.chatex.fragments.FriendsFragment;
@@ -86,6 +84,9 @@ public class MainActivity extends AppCompatActivity
 
         //check whether the user is signed in or not
         checkUserSignedIn();
+
+        //check whether email verified
+        checkEmailVerified();
 
         //Setting up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -134,6 +135,18 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
+    }
+
+    public void checkEmailVerified(){
+        SharedPreferences prefs = getSharedPreferences("com.thecoffeecoders.chatex", MODE_PRIVATE);
+        boolean isEmailVerified = prefs.getBoolean("email_verified", true);
+
+        if(!isEmailVerified){
+            Toast.makeText(this, mUser.getDisplayName(), Toast.LENGTH_SHORT).show();
+            Intent verifyEmailIntent = new Intent(this, VerifyEmailActivity.class);
+            startActivity(verifyEmailIntent);
+            finish();
+        }
     }
 
     private void initializeViews(NavigationView navigationView){
@@ -244,6 +257,8 @@ public class MainActivity extends AppCompatActivity
             //RequestsFragment
             fragment = new RequestsFragment();
         } else if (id == R.id.nav_share) {
+            Intent newGroupintent = new Intent(this, GroupChatActivity.class);
+            startActivity(newGroupintent);
 
         } else if (id == R.id.nav_find_friends) {
             fragment = new FindFriendsFragment();
