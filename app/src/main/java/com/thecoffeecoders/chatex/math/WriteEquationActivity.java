@@ -33,12 +33,13 @@ import com.thecoffeecoders.chatex.adapters.EquationAdapter;
 import com.thecoffeecoders.chatex.adapters.SuggestionRecyclerAdapter;
 import com.thecoffeecoders.chatex.db.EquationContract;
 import com.thecoffeecoders.chatex.db.EquationDBHelper;
+import com.thecoffeecoders.chatex.interfaces.OnAdapterItemClicked;
 import com.thecoffeecoders.chatex.models.Equation;
 import com.thecoffeecoders.chatex.utils.Utils;
 
 import io.github.kexanie.library.MathView;
 
-public class WriteEquationActivity extends AppCompatActivity {
+public class WriteEquationActivity extends AppCompatActivity implements OnAdapterItemClicked {
 
     SQLiteDatabase mLocalDatabase;
 
@@ -60,6 +61,8 @@ public class WriteEquationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_write_equation);
 
         Log.d("token", FirebaseInstanceId.getInstance().getToken());
+
+        getSupportActionBar().setTitle("Write Equation");
 
         EquationDBHelper dbHelper = new EquationDBHelper(this);
         mLocalDatabase = dbHelper.getWritableDatabase();
@@ -91,7 +94,7 @@ public class WriteEquationActivity extends AppCompatActivity {
 //        mSuggestionRecyclerAdapter = new SuggestionRecyclerAdapter(options);
 //        mSuggestionRecyclerView.setAdapter(mSuggestionRecyclerAdapter);
 
-        mEquationAdapter = new EquationAdapter(this, getEquationSuggestions());
+        mEquationAdapter = new EquationAdapter(this, getEquationSuggestions(), this);
         mSuggestionRecyclerView.setAdapter(mEquationAdapter);
 
     }
@@ -218,4 +221,9 @@ public class WriteEquationActivity extends AppCompatActivity {
         );
     }
 
+    @Override
+    public void onAdapterItemClicked(String value) {
+        mTypedEquationEditText.getText().clear();
+        mTypedEquationEditText.setText(value);
+    }
 }

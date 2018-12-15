@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -19,7 +21,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,7 +39,11 @@ import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Group;
 import com.thecoffeecoders.chatex.models.Message;
 import com.thecoffeecoders.chatex.models.User;
+import com.thecoffeecoders.chatex.users.UserProfileActivity;
 import com.thecoffeecoders.chatex.utils.Utils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChatRecyclerAdapter extends FirebaseRecyclerAdapter<Chat, RecyclerView.ViewHolder> {
 
@@ -71,8 +80,9 @@ public class ChatRecyclerAdapter extends FirebaseRecyclerAdapter<Chat, RecyclerV
                             if(dataSnapshot.exists()){
                                 Message message = dataSnapshot.getValue(Message.class);
                                 final String content = message.getContent();
+                                final String type = message.getType();
                                 final long timestamp = message.getTimestamp();
-                                ((ChatViewHolder)holder).bind(user, content, timestamp, model.isSeen());
+                                ((ChatViewHolder)holder).bind(user, content, type, timestamp, model.isSeen());
                                 ((ChatViewHolder) holder).view.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -112,8 +122,9 @@ public class ChatRecyclerAdapter extends FirebaseRecyclerAdapter<Chat, RecyclerV
                                         if(dataSnapshot.exists()){
                                             Message message = dataSnapshot.getValue(Message.class);
                                             final String content = message.getContent();
+                                            final String type = message.getType();
                                             final long timestamp = message.getTimestamp();
-                                            ((ChatViewHolder)holder).bind(group, content, timestamp, model.isSeen());
+                                            ((ChatViewHolder)holder).bind(group, content, type, timestamp, model.isSeen());
                                             ((ChatViewHolder) holder).view.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
@@ -175,7 +186,7 @@ public class ChatRecyclerAdapter extends FirebaseRecyclerAdapter<Chat, RecyclerV
         }
     }
 
-    public static class ChatViewHolder extends RecyclerView.ViewHolder{
+    public class ChatViewHolder extends RecyclerView.ViewHolder{
 
         TextView nameTextView;
         TextView lastMsgTextView;
@@ -198,7 +209,7 @@ public class ChatRecyclerAdapter extends FirebaseRecyclerAdapter<Chat, RecyclerV
             view = itemView;
         }
 
-        public void bind(User user, String lastMessageContent, long timestamp, boolean seen){
+        public void bind(final User user, String lastMessageContent, String type, long timestamp, boolean seen){
             nameTextView.setText(user.getDisplayName());
             usernameTextView.setText("@" + user.getUsername());
             String time = Utils.convertTimestampToDate(timestamp);
@@ -218,10 +229,27 @@ public class ChatRecyclerAdapter extends FirebaseRecyclerAdapter<Chat, RecyclerV
             if(!seen){
                 lastMsgTextView.setTypeface(ResourcesCompat.getFont(context, R.font.nunito_light), Typeface.BOLD);
             }
-            lastMsgTextView.setText(lastMessageContent);
+
+            if(type.equals("math")){
+                lastMsgTextView.setText("Math Expression");
+            } else if(type.equals("image")){
+                lastMsgTextView.setText("Image Message");
+            } else if(type.equals("location")){
+                lastMsgTextView.setText("Location Message");
+            } else{
+                lastMsgTextView.setText(lastMessageContent);
+            }
+
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    showPopup(view, user.getId());
+                    return false;
+                }
+            });
         }
 
-        public void bind(Group group, String lastMessageContent, long timestamp, boolean seen){
+        public void bind(Group group, String lastMessageContent, String type, long timestamp, boolean seen){
             nameTextView.setText("Group: " + group.getName());
             usernameTextView.setText("");
             String time = Utils.convertTimestampToDate(timestamp);
@@ -250,7 +278,67 @@ public class ChatRecyclerAdapter extends FirebaseRecyclerAdapter<Chat, RecyclerV
                 Constants.CHATS_COUNT ++;
                 lastMsgTextView.setTypeface(ResourcesCompat.getFont(context, R.font.nunito_light), Typeface.BOLD);
             }
-            lastMsgTextView.setText(lastMessageContent);
+
+            if(type.equals("math")){
+                lastMsgTextView.setText("Math Expression");
+            } else if(type.equals("image")){
+                lastMsgTextView.setText("Image Message");
+            } else if(type.equals("location")){
+                lastMsgTextView.setText("Location Message");
+            } else{
+                lastMsgTextView.setText(lastMessageContent);
+            }
+
         }
+
+        public void showPopup(View view, final String uid) {
+//        PopupMenu popup = new PopupMenu(this, v);
+//        MenuInflater inflater = popup.getMenuInflater();
+//        inflater.inflate(R.menu.chat_extensions_menu, popup.getMenu());
+
+            PopupMenu popup = new PopupMenu(context, view);
+            popup.getMenuInflater().inflate(R.menu.chat_fragment_item_long_click_options, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch (menuItem.getItemId()){
+                        case R.id.chat_fragment_open_profile:
+                            Intent openProfileIntent = new Intent(context, UserProfileActivity.class);
+                            openProfileIntent.putExtra("uid", uid);
+                            context.startActivity(openProfileIntent);
+                            break;
+                        case R.id.chat_fragment_delete_convo:
+                            deleteConvoFromFirebase(uid);
+                            break;
+                    }
+                    return false;
+                }
+            });
+            popup.show();
+        }
+
+        private void deleteConvoFromFirebase(String otheruseruid) {
+            DatabaseReference dbRef = FirebaseDatabase
+                    .getInstance()
+                    .getReference();
+//                    .child("chat")
+//                    .child(FirebaseAuth.getInstance().getUid())
+//                    .child(uid);
+            String thisuserid = FirebaseAuth.getInstance().getUid();
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("chat/" + thisuserid + "/" + otheruseruid, null);
+            childUpdates.put("messages/" + thisuserid + "/" + otheruseruid, null);
+            dbRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        ChatRecyclerAdapter.this.notifyDataSetChanged();
+                        //Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
     }
 }

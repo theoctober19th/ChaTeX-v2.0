@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-exports.sendNotification = functions.database.ref('messages/{user_id1}/{user_id2}/{message_id}').onCreate((snapshot, context) =>{
+exports.sendMessageNotification = functions.database.ref('messages/{user_id1}/{user_id2}/{message_id}').onCreate((snapshot, context) =>{
     const message_id = context.params.message_id;
     const user_id1 = context.params.user_id1;
     const user_id2 = context.params.user_id2;
@@ -50,4 +50,41 @@ exports.sendNotification = functions.database.ref('messages/{user_id1}/{user_id2
         });
 
     });
+});
+
+exports.sendRequestNotification = functions.database.ref('requests/{user_id1}/{user_id2}').onCreate((snapshot, context) =>{
+    const user_id1 = context.params.user_id1;
+    const user_id2 = context.params.user_id2;
+    const request = snapshot.val();
+    const request_type = request.type;
+
+    if(request_type == 'sent'){
+        return console.log('This user sent the request');
+    }
+
+    const deviceToken = admin.database().ref(`/users/${user_id1}/deviceToken`).once('value');
+    return deviceToken.then(result =>{
+        const device_token = result.val();
+
+        const displayName = admin.database().ref(`/users/${user_id2}/displayName`).once('value');
+        return displayName.then(result =>{
+            const sender_name = result.val();
+
+            const payload = {
+                token : device_token,
+                android:{
+                    notification:{
+                        title : sender_name,
+                        body : 'New Message Request',
+                        tag : user_id2
+                    }
+                }
+            };
+
+            return admin.messaging().send(payload).then(response =>{
+                console.log("Notification sent to " + user_id1 + " device token is " + device_token);
+            });
+        });
+    });
+
 });

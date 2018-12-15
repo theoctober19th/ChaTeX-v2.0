@@ -26,6 +26,7 @@
             android:id="@+id/chat_appbar_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:text="Bikalpa Dhakal"
             android:textSize="16sp"
             android:textStyle="bold"

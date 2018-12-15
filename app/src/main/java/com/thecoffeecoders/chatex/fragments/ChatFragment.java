@@ -1,16 +1,20 @@
 package com.thecoffeecoders.chatex.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,11 +22,20 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.adapters.ChatRecyclerAdapter;
+import com.thecoffeecoders.chatex.chat.ChatActivity;
+import com.thecoffeecoders.chatex.math.WriteEquationActivity;
+import com.thecoffeecoders.chatex.misc.SendLocation;
 import com.thecoffeecoders.chatex.models.Chat;
 import com.thecoffeecoders.chatex.models.Friend;
+import com.thecoffeecoders.chatex.users.UserProfileActivity;
 import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ChatFragment extends Fragment {
 //    private static final String ARG_PARAM1 = "param1";
@@ -151,4 +164,5 @@ public class ChatFragment extends Fragment {
         mChatRecyclerAdapter = new ChatRecyclerAdapter(options, getContext(), mProgressBar);
         mChatListRecyclerView.setAdapter(mChatRecyclerAdapter);
     }
+
 }

@@ -13,8 +13,9 @@
         android:id="@+id/chatMessageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/chat_input_layout"
-        app:layout_constraintTop_toBottomOf="@id/chat_appbar"></com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView>
+        app:layout_constraintBottom_toTopOf="@id/chat_bottom_container"
+        app:layout_constraintTop_toBottomOf="@id/chat_appbar"
+        app:stackFromEnd="true"></com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/activity_chat_empty_view"
@@ -56,56 +57,103 @@
         />
     </android.support.constraint.ConstraintLayout>
 
-    <LinearLayout
-
-        android:id="@+id/chat_input_layout"
+    <RelativeLayout
+        android:id="@+id/chat_bottom_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="horizontal"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabAddChatExtension"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:onClick="showPopup"
-            android:src="@drawable/ic_plus_white"
-            app:fabSize="mini" />
+        <LinearLayout
 
-        <EditText
-            android:id="@+id/et_chatmessage"
-            android:layout_width="wrap_content"
+            android:id="@+id/chat_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="61dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fabAddChatExtension"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:onClick="showPopup"
+                android:src="@drawable/ic_plus_white"
+                app:fabSize="mini" />
+
+            <EditText
+                android:id="@+id/et_chatmessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_edittext"
+                android:fontFamily="@font/nunito_light"
+                android:hint="Type a message.."
+                android:maxLines="4"
+                android:minLines="2"
+                android:padding="8dp"
+                android:textSize="16sp" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fabSendMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/ic_menu_send"
+                app:fabSize="mini" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:id="@+id/chat_request_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/rounded_edittext"
-            android:fontFamily="@font/nunito_light"
-            android:hint="Type a message.."
-            android:maxLines="4"
-            android:padding="8dp"
-            android:textSize="16sp"
-            android:minLines="2"
-            android:layout_weight="1"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabSendMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fabSize="mini"
-            android:layout_gravity="bottom"
             android:layout_marginBottom="8dp"
-            android:src="@drawable/ic_menu_send"/>
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.4"
+            app:layout_constraintStart_toStartOf="parent">
 
+            <Button
+                android:id="@+id/activity_chat_accept_request_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_button"
+                android:text="Accept" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/activity_chat_reject_request_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/rounded_button"
+                android:text="Decline" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
 
     <ProgressBar

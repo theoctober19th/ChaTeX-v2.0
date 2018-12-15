@@ -15,8 +15,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,14 +32,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.adapters.GroupMessageRecyclerAdapter;
 import com.thecoffeecoders.chatex.adapters.MessageRecyclerAdapter;
 import com.thecoffeecoders.chatex.math.WriteEquationActivity;
 import com.thecoffeecoders.chatex.misc.SendLocation;
 import com.thecoffeecoders.chatex.models.Chat;
+import com.thecoffeecoders.chatex.models.Group;
 import com.thecoffeecoders.chatex.models.Message;
 import com.thecoffeecoders.chatex.models.Request;
+import com.thecoffeecoders.chatex.models.User;
 import com.thecoffeecoders.chatex.users.UserProfileActivity;
 
 import java.lang.reflect.Field;
@@ -51,6 +58,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private FloatingActionButton mChatExtensionBtn;
     private LinearLayout mChatInputLayout;
     private LinearLayout mRequestOptionsLayout;
+    android.support.v7.widget.Toolbar mToolbar;
 
     private GroupMessageRecyclerAdapter mMessageAdapter;
 
@@ -86,6 +94,7 @@ public class GroupChatActivity extends AppCompatActivity {
         mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //checkIfFriends();
+        setToolbar();
         addAdapter();
     }
 
@@ -155,6 +164,7 @@ public class GroupChatActivity extends AppCompatActivity {
         mProgressBar = findViewById(R.id.groupchat_activity_progress_bar);
         mProgressBar.setVisibility(ProgressBar.VISIBLE);
         mChatInputLayout = findViewById(R.id.groupchat_input_layout);
+        mToolbar = findViewById(R.id.groupchat_appbar);
         //mRequestOptionsLayout = findViewById(R.id.request_options_layout);
 
         //mChatInputLayout.setVisibility(View.VISIBLE);
@@ -263,6 +273,45 @@ public class GroupChatActivity extends AppCompatActivity {
                 sendMessage(latexCode, "math");
             }
         }
+    }
+
+    private void setToolbar() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        DatabaseReference otherUserRef = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child("groups")
+                .child(groupID);
+        otherUserRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Group group = dataSnapshot.getValue(Group.class);
+                    String groupPicURI = group.getGroupPicURI();
+                    String groupName = group.getName();
+                    int memberCount = group.getMemberCount();
+
+                    CircularImageView appbarImage = findViewById(R.id.chat_appbar_image);
+                    Glide.with(GroupChatActivity.this)
+                            .applyDefaultRequestOptions(new RequestOptions()
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL))
+                            .load(groupPicURI)
+                            .into(appbarImage);
+                    TextView appBarDisplayName = findViewById(R.id.chat_appbar_name);
+                    appBarDisplayName.setText(groupName);
+                    TextView appBarLastOnline = findViewById(R.id.chat_appbar_lastOnline);
+                    //appBarLastOnline.setText("TODO : Last online");
+                    appBarLastOnline.setText(String.valueOf(memberCount) + " members");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void fetchImageFromDevice(){

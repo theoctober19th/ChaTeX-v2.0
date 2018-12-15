@@ -2,7 +2,9 @@ package com.thecoffeecoders.chatex;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,17 +36,27 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import com.thecoffeecoders.chatex.adapters.AddGroupFriendAdapter;
 import com.thecoffeecoders.chatex.adapters.FriendRecyclerAdapter;
 import com.thecoffeecoders.chatex.chat.GroupChatActivity;
 import com.thecoffeecoders.chatex.interfaces.OnAdapterItemClicked;
 import com.thecoffeecoders.chatex.models.Friend;
 import com.thecoffeecoders.chatex.models.Group;
+import com.thecoffeecoders.chatex.users.EditProfileActivity;
 import com.thecoffeecoders.chatex.views.RecyclerViewWithEmptyView;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import id.zelory.compressor.Compressor;
 
 public class AddGroupActivity extends AppCompatActivity implements OnAdapterItemClicked {
 
@@ -52,6 +65,7 @@ public class AddGroupActivity extends AppCompatActivity implements OnAdapterItem
     EditText mGroupNameEditText;
     RecyclerViewWithEmptyView mFriendListRecyclerView;
     FloatingActionButton mAddGroupBtn;
+    ProgressBar mAddGroupPictureProgressBar;
 
     //Firebase Objects
     FirebaseAuth mAuth;
@@ -69,11 +83,13 @@ public class AddGroupActivity extends AppCompatActivity implements OnAdapterItem
     private int userCount = 1;
     private Group mGroup;
 
+    private String groupPicURI = null;
+    private final int RC_IMAGE_PICKER_GROUP_PHOTO = 001;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_group);
-
 
 
         initializeLayoutFieldsAndFirebaseObjects();
@@ -84,6 +100,90 @@ public class AddGroupActivity extends AppCompatActivity implements OnAdapterItem
                 addNewGroupToFirebase();
             }
         });
+
+        mGroupPhotoImgView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setMinCropResultSize(300, 300)
+                        .setFixAspectRatio(true)
+                        .getIntent(AddGroupActivity.this);
+                startActivityForResult(intent, RC_IMAGE_PICKER_GROUP_PHOTO);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == RESULT_OK){
+
+            switch (requestCode){
+                case RC_IMAGE_PICKER_GROUP_PHOTO :
+                    CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                    mAddGroupPictureProgressBar.setVisibility(View.VISIBLE);
+                    mAddGroupBtn.hide();
+
+                    Uri groupPictureURI = result.getUri();
+                    File originalPictureFile = new File(groupPictureURI.getPath());
+                    File compressedPictureFile = originalPictureFile;
+                    try {
+                        compressedPictureFile = new Compressor(this)
+                                .setMaxWidth(300)
+                                .setMaxHeight(300)
+                                .setQuality(75)
+                                .compressToFile(originalPictureFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    RequestOptions requestOptions = new RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(R.drawable.img_profile_picture_placeholder_female);
+                    Glide.with(AddGroupActivity.this)
+                            .applyDefaultRequestOptions(requestOptions)
+                            .load(groupPictureURI)
+                            .into(mGroupPhotoImgView);
+
+                    FirebaseStorage mStorage = FirebaseStorage.getInstance();
+                    final StorageReference groupPictureRef =
+                            mStorage.getReference()
+                                    .child("group_images")
+                                    .child(FirebaseDatabase
+                                            .getInstance()
+                                            .getReference()
+                                            .child("keys")
+                                            .push()
+                                            .getKey()
+                                    );
+                    UploadTask uploadTask = groupPictureRef.putFile(Uri.fromFile(compressedPictureFile));
+                    Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        @Override
+                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                            if (!task.isSuccessful()) {
+                                throw task.getException();
+                            }
+                            return groupPictureRef.getDownloadUrl();
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                Uri downloadUri = task.getResult();
+                                groupPicURI = downloadUri.toString();
+                                mAddGroupPictureProgressBar.setVisibility(View.GONE);
+                                mAddGroupBtn.show();
+                            } else {
+                                // Handle failures
+                                // ...
+                            }
+                        }
+                    });
+                    break;
+            }
+        }
     }
 
     private void addNewGroupToFirebase() {
@@ -99,7 +199,8 @@ public class AddGroupActivity extends AppCompatActivity implements OnAdapterItem
         }
         mGroup.setName(groupName);
         mGroup.setMemberCount(userCount);
-        //mGroup.setGroupPicURI("https://us.123rf.com/450wm/yurich84/yurich841805/yurich84180500120/102048648-html-header-markup-extreme-close-up-coding-and-programming-concept.jpg?ver=6");
+        mGroup.setCreator(mAuth.getUid());
+        mGroup.setGroupPicURI(groupPicURI);
         mGroup.setCreated(System.currentTimeMillis());
         membersMap.put(mUser.getUid(), memberInfoMap);
         final String groupKey = mGroupRef.push().getKey();
@@ -162,48 +263,6 @@ public class AddGroupActivity extends AppCompatActivity implements OnAdapterItem
                 .build();
 
         mFirebaseRecyclerAdapter = new AddGroupFriendAdapter(options, this);
-//        mFirebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Friend, FriendsViewHolder>(options) {
-//            @Override
-//            protected void onBindViewHolder(@NonNull final FriendsViewHolder holder, int position, @NonNull Friend model) {
-//                holder.setFriendsSince(model.getSince());
-//
-//                final String list_user_id = getRef(position).getKey();
-//                Log.d("bikalpa", list_user_id);
-//                mUserRef.child(list_user_id).addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                        final String username = dataSnapshot.child("username").getValue().toString();
-//                        String profilePicURI = dataSnapshot.child("profilePicURI").getValue().toString();
-//                        String online = dataSnapshot.child("onlineStatus").getValue().toString();
-//                        String displayName = dataSnapshot.child("displayName").getValue().toString();
-//                        holder.setDisplayName(displayName);
-//                        holder.setUserName(username);
-//                        holder.setProfilePicture(profilePicURI);
-//                        holder.setOnline(online);
-//                        holder.mView.setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-//                                holder.changeSelected(list_user_id);
-//                            }
-//                        });
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//                    }
-//                });
-//            }
-//
-//
-//            @NonNull
-//            @Override
-//            public FriendsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-//                View view = LayoutInflater.from(viewGroup.getContext())
-//                        .inflate(R.layout.user_single_layout, viewGroup, false);
-//
-//                return new FriendsViewHolder(view);
-//            }
-//        };
         mFriendListRecyclerView.setAdapter(mFirebaseRecyclerAdapter);
     }
 
@@ -215,6 +274,7 @@ public class AddGroupActivity extends AppCompatActivity implements OnAdapterItem
         mFriendListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         View emptyView = findViewById(R.id.activity_add_group_empty_view);
         mFriendListRecyclerView.setEmptyView(emptyView);
+        mAddGroupPictureProgressBar = findViewById(R.id.add_group_picture_progress_bar);
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();

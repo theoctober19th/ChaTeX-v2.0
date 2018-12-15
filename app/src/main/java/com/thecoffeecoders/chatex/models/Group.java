@@ -3,11 +3,20 @@ package com.thecoffeecoders.chatex.models;
 public class Group {
     private String id;
     private String name;
+    private String creator;
     private long created;
     private int memberCount;
     private String groupPicURI;
 
     public Group() {
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     public String getId() {

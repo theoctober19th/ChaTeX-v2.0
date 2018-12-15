@@ -25,24 +25,32 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 
+    <TextView
+        android:id="@+id/textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Here are some suggestions: "
+        app:layout_constraintTop_toBottomOf="@id/et_typed_equation"
+        android:fontFamily="@font/nunito_light"
+        android:layout_marginLeft="8dp"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/suggestion_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="8dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@id/latexButtonScrollView"
-        app:layout_constraintTop_toBottomOf="@id/et_typed_equation"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        ></android.support.v7.widget.RecyclerView>
+        app:layout_constraintTop_toBottomOf="@id/textview"></android.support.v7.widget.RecyclerView>
 
     <ImageView
         android:id="@+id/showSuggestionImgView"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:onClick="onSuggestionClicked"
         app:layout_constraintBottom_toBottomOf="@id/et_typed_equation"
         app:layout_constraintRight_toRightOf="@id/et_typed_equation"
@@ -51,9 +59,9 @@
     <io.github.kexanie.library.MathView
         android:id="@+id/math_preview_pane"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        app:engine="KaTeX"
-        android:minHeight="300dp">
+        android:layout_height="80dp"
+        android:minHeight="300dp"
+        app:engine="KaTeX">
 
     </io.github.kexanie.library.MathView>
 

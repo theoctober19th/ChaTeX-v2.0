@@ -3,19 +3,25 @@ package com.thecoffeecoders.chatex.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +32,11 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.chat.ChatActivity;
 import com.thecoffeecoders.chatex.models.Friend;
+import com.thecoffeecoders.chatex.users.UserProfileActivity;
 import com.thecoffeecoders.chatex.utils.Utils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FriendRecyclerAdapter extends FirebaseRecyclerAdapter<Friend, FriendRecyclerAdapter.FriendsViewHolder> {
 
@@ -73,6 +83,13 @@ public class FriendRecyclerAdapter extends FirebaseRecyclerAdapter<Friend, Frien
                         holder.context.startActivity(chatIntent);
                     }
                 });
+                holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        holder.showPopup(v, list_user_id);
+                        return false;
+                    }
+                });
 
             }
 
@@ -107,7 +124,7 @@ public class FriendRecyclerAdapter extends FirebaseRecyclerAdapter<Friend, Frien
         public FriendsViewHolder(@NonNull View itemView) {
             super(itemView);
             mView = itemView;
-            context = mView.getContext().getApplicationContext();
+            context = mView.getContext();
         }
 
         public void setLastOnlineDate(long timestamp){
@@ -143,6 +160,51 @@ public class FriendRecyclerAdapter extends FirebaseRecyclerAdapter<Friend, Frien
                     .applyDefaultRequestOptions(requestOptions)
                     .load(profilePicURI)
                     .into(profilePicture);
+        }
+
+        public void showPopup(View view, final String uid) {
+            PopupMenu popup = new PopupMenu(context, view);
+            popup.getMenuInflater().inflate(R.menu.friend_fragment_item_long_click_options, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch (menuItem.getItemId()){
+                        case R.id.friend_fragment_open_profile:
+                            Intent openProfileIntent = new Intent(context, UserProfileActivity.class);
+                            openProfileIntent.putExtra("uid", uid);
+                            context.startActivity(openProfileIntent);
+                            break;
+                        case R.id.friend_fragment_unfriend:
+                            deleteFriendFromFirebase(uid);
+                            break;
+                    }
+                    return false;
+                }
+            });
+            popup.show();
+        }
+
+        private void deleteFriendFromFirebase(String otheruserid) {
+            DatabaseReference friendRef = FirebaseDatabase
+                    .getInstance()
+                    .getReference()
+                    .child("friendlist");
+            String thisuserid = FirebaseAuth.getInstance().getUid();
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put(thisuserid + "/" + otheruserid, null);
+            childUpdates.put(otheruserid + "/" + thisuserid, null);
+
+            friendRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        FriendRecyclerAdapter.this.notifyDataSetChanged();
+                        Toast.makeText(context, "UNFRIENDED this person", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
         }
     }
 }

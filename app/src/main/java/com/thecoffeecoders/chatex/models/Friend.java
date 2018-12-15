@@ -6,6 +6,10 @@ public class Friend {
     public Friend() {
     }
 
+    public Friend(String since) {
+        this.since = since;
+    }
+
     public String getSince() {
         return since;
     }

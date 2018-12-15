@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import com.thecoffeecoders.chatex.R;
 import com.thecoffeecoders.chatex.db.EquationContract;
+import com.thecoffeecoders.chatex.interfaces.OnAdapterItemClicked;
 
 import io.github.kexanie.library.MathView;
 
@@ -19,16 +20,18 @@ public class EquationAdapter extends RecyclerView.Adapter<EquationAdapter.Equati
     private Context mContext;
     private Cursor mCursor;
 
-    public EquationAdapter(Context context, Cursor cursor){
+    private OnAdapterItemClicked mCallback;
+
+    public EquationAdapter(Context context, Cursor cursor, OnAdapterItemClicked listener){
         mContext = context;
         mCursor = cursor;
+        this.mCallback = listener;
     }
 
     @NonNull
     @Override
     public EquationViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.row_single_equation, viewGroup, false);
-
         return  new EquationViewHolder(view);
     }
 
@@ -55,12 +58,16 @@ public class EquationAdapter extends RecyclerView.Adapter<EquationAdapter.Equati
 
         public EquationViewHolder(@NonNull View itemView) {
             super(itemView);
-
             mathView = itemView.findViewById(R.id.suggestion_mathview);
         }
-
-        private void bind(String equation){
+        private void bind(final String equation){
             mathView.setText("\\(" + equation + "\\)");
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCallback.onAdapterItemClicked(equation);
+                }
+            });
         }
     }
 

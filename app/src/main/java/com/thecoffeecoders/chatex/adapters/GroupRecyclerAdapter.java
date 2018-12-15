@@ -1,10 +1,13 @@
 package com.thecoffeecoders.chatex.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,18 +20,25 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thecoffeecoders.chatex.R;
+import com.thecoffeecoders.chatex.chat.GroupChatActivity;
 import com.thecoffeecoders.chatex.fragments.GroupsFragment;
 import com.thecoffeecoders.chatex.models.Group;
+import com.thecoffeecoders.chatex.users.UserProfileActivity;
 import com.thecoffeecoders.chatex.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GroupRecyclerAdapter extends FirebaseRecyclerAdapter<Boolean, GroupRecyclerAdapter.GroupsViewHolder> {
 
@@ -123,10 +133,56 @@ public class GroupRecyclerAdapter extends FirebaseRecyclerAdapter<Boolean, Group
                     takeToGroupChatActivity(model.getId());
                 }
             });
+
+            mView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    showPopup(v, model.getId());
+                    return false;
+                }
+            });
         }
 
         public void takeToGroupChatActivity(String groupID){
+            Intent groupChatIntent = new Intent(mContext, GroupChatActivity.class);
+            groupChatIntent.putExtra("groupid", groupID);
+            mContext.startActivity(groupChatIntent);
+        }
 
+        public void showPopup(View view, final String groupID) {
+            PopupMenu popup = new PopupMenu(mContext, view);
+            popup.getMenuInflater().inflate(R.menu.group_fragment_item_long_click_options, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch (menuItem.getItemId()){
+                        case R.id.group_fragment_leave_group:
+                            leaveGroup(groupID);
+                            break;
+                    }
+                    return false;
+                }
+            });
+            popup.show();
+        }
+
+        private void leaveGroup(String groupID) {
+            DatabaseReference dbRef = FirebaseDatabase
+                    .getInstance()
+                    .getReference();
+            String thisuserid = FirebaseAuth.getInstance().getUid();
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("groupmembers/" + groupID + "/" + thisuserid, null);
+            childUpdates.put("usergroups/" + thisuserid + "/" + groupID, null );
+            dbRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        GroupRecyclerAdapter.this.notifyDataSetChanged();
+                    }
+                }
+            });
         }
     }
 }

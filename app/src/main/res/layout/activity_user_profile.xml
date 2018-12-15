@@ -73,6 +73,7 @@
                 android:layout_below="@+id/user_profile_username"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="12dp"
+                android:layout_marginLeft="8dp"
                 android:text="Android free tutorials and example"
                 android:textColor="#fff"
                 android:textSize="14sp"
@@ -110,43 +111,43 @@
                 android:clickable="true"
                 android:elevation="4dp"
                 android:padding="20dp"
-                android:text="Member since"
+                android:text="Member since 24 July 2018"
                 android:fontFamily="@font/nunito_light"/>
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:background="#fff"
-                android:clickable="true"
-                android:elevation="4dp"
-                android:padding="20dp"
-                android:text="In case you need me sometime"
-                android:fontFamily="@font/nunito_light"/>
+            <!--<TextView-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="5dp"-->
+                <!--android:background="#fff"-->
+                <!--android:clickable="true"-->
+                <!--android:elevation="4dp"-->
+                <!--android:padding="20dp"-->
+                <!--android:text="In case you need me sometime"-->
+                <!--android:fontFamily="@font/nunito_light"/>-->
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_marginBottom="3dp"
-                android:layout_marginTop="3dp"
-                android:background="#fff"
-                android:clickable="true"
-                android:elevation="4dp"
-                android:padding="20dp"
-                android:text="Or perhaps me?? Do you think?"
-                android:fontFamily="@font/nunito_light"/>
+            <!--<TextView-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="5dp"-->
+                <!--android:layout_marginBottom="3dp"-->
+                <!--android:layout_marginTop="3dp"-->
+                <!--android:background="#fff"-->
+                <!--android:clickable="true"-->
+                <!--android:elevation="4dp"-->
+                <!--android:padding="20dp"-->
+                <!--android:text="Or perhaps me?? Do you think?"-->
+                <!--android:fontFamily="@font/nunito_light"/>-->
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:background="#fff"
-                android:clickable="true"
-                android:elevation="4dp"
-                android:padding="20dp"
-                android:text="I'm an alien of that i'm sure"
-                android:fontFamily="@font/nunito_light"/>
+            <!--<TextView-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="5dp"-->
+                <!--android:background="#fff"-->
+                <!--android:clickable="true"-->
+                <!--android:elevation="4dp"-->
+                <!--android:padding="20dp"-->
+                <!--android:text="I'm an alien of that i'm sure"-->
+                <!--android:fontFamily="@font/nunito_light"/>-->
         </LinearLayout>
 
     </RelativeLayout>

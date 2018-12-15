@@ -19,6 +19,7 @@
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".ChatexChatApplication"
@@ -67,13 +68,17 @@
             </intent-filter>
         </activity>
         <activity android:name=".users.EditProfileActivity" />
-        <activity android:name=".users.UserProfileActivity"
-            android:theme="@style/ChatexNoAppBarTheme"/>
-        <activity android:name=".chat.ChatActivity"
-            android:theme="@style/ChatexNoAppBarTheme"
-            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".users.UserProfileActivity"
+            android:theme="@style/ChatexNoAppBarTheme" />
+        <activity
+            android:name=".chat.ChatActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChatexNoAppBarTheme" />
         <activity android:name=".AddGroupActivity" />
-        <activity android:name=".chat.GroupChatActivity" />
+        <activity android:name=".chat.GroupChatActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ChatexNoAppBarTheme"/>
         <activity
             android:name=".auth.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -102,7 +107,7 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".math.WriteEquationActivity"></activity>
+        <activity android:name=".math.WriteEquationActivity" />
 
         <service android:name=".firebase.ChatexFirebaseMessagingService">
             <intent-filter>
@@ -110,19 +115,22 @@
             </intent-filter>
         </service>
 
-        <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
-     See README(https://goo.gl/l4GJaQ) for more. -->
+        <!--
+     Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/chatex_app_icon" />
-        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <!--
+             Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
 
+        <activity android:name=".ViewEquation"></activity>
     </application>
-
-
 
 </manifest>

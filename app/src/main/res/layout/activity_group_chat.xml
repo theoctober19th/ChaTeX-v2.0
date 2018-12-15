@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".chat.GroupChatActivity">
 
+    <include layout="@layout/chat_toolbar_layout"
+        android:id="@+id/groupchat_appbar"></include>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/groupChatMessageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/groupchat_input_layout"
-        app:layout_constraintTop_toTopOf="parent"></android.support.v7.widget.RecyclerView>
+        app:layout_constraintTop_toBottomOf="@id/groupchat_appbar"></android.support.v7.widget.RecyclerView>
 
     <LinearLayout
 
